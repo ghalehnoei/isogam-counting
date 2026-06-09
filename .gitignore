@@ -24,12 +24,7 @@ ENV/
 .ultralytics/
 .mplconfig/
 
-# Model files (large)
-*.pt
-*.pth
-*.onnx
-*.engine
-*.pb
+
 
 # Dataset cache
 Objectdetection/dataset/labels/*.cache
