@@ -1,0 +1,9 @@
+
+ultralytics
+opencv-python
+numpy
+fastapi
+uvicorn
+python-multipart
+# For GPU support, ensure you have installed the appropriate PyTorch (or other ML framework) with CUDA support following your specific environment setup instructions:
+# Example for PyTorch: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121

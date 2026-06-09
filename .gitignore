@@ -1,0 +1,63 @@
+# ایجاد .gitignore جدید
+@"
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+.venv/
+.venv_win/
+env/
+venv/
+ENV/
+
+# Local caches
+.pytest_cache/
+.mypy_cache/
+.torch/
+.ultralytics/
+.mplconfig/
+
+# Model files (large)
+*.pt
+*.pth
+*.onnx
+*.engine
+*.pb
+
+# Dataset cache
+Objectdetection/dataset/labels/*.cache
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and databases
+*.db
+*.log
+logs/
+data/ngl.db
+data/runs/
+data/reports/
+
+# Temporary files
+dataset/
+runs/
+data/
+tmp/
+temp/
+uploads/
+downloads/
+"@ | Out-File -FilePath .gitignore -Encoding utf8

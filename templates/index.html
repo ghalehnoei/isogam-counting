@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isogam Counter</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: flex-start;
+            padding: 40px 20px;
+        }
+        .container {
+            background: rgba(255,255,255,.06);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 20px; padding: 40px; max-width: 960px; width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
+        }
+        h1 {
+            font-size: 22px; font-weight: 600; color: #fff; letter-spacing: -.3px;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
+        }
+        h1::before {
+            content: ''; display: inline-block; width: 8px; height: 24px;
+            background: linear-gradient(180deg, #60a5fa, #a78bfa); border-radius: 4px;
+        }
+
+        .model-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+        .model-row label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.6); white-space: nowrap; }
+        .model-row select {
+            flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.12);
+            background: rgba(255,255,255,.06); color: #fff; font-size: 14px; outline: none;
+            cursor: pointer; appearance: auto;
+        }
+        .model-row select option { background: #1a1a2e; color: #fff; }
+
+        .conf-row { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+        .conf-row label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.6); white-space: nowrap; }
+        .conf-row input[type=range] {
+            flex: 1; -webkit-appearance: none; appearance: none; height: 4px;
+            background: rgba(255,255,255,.15); border-radius: 2px; outline: none;
+        }
+        .conf-row input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa); cursor: pointer;
+            box-shadow: 0 0 12px rgba(96,165,250,.4);
+        }
+        .conf-row .val {
+            font-size: 13px; font-weight: 600; color: #fff; min-width: 40px; text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .drop-zone {
+            border: 1.5px dashed rgba(255,255,255,.18); border-radius: 14px; padding: 48px 24px;
+            text-align: center; cursor: pointer; transition: all .25s ease;
+            background: rgba(255,255,255,.02);
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #60a5fa; background: rgba(96,165,250,.06);
+            box-shadow: 0 0 30px rgba(96,165,250,.1);
+        }
+        .drop-zone p { color: rgba(255,255,255,.45); font-size: 15px; font-weight: 400; }
+        .drop-zone p::before { content: '\2B06\FE0F  '; font-size: 18px; }
+        .drop-zone p small { color: rgba(255,255,255,.3); display: block; margin-top: 6px; font-size: 12px; }
+
+        .hint {
+            display: none; margin-top: 12px; padding: 10px 14px;
+            background: rgba(96,165,250,.08); border: 1px solid rgba(96,165,250,.2);
+            border-radius: 8px; font-size: 13px; color: rgba(255,255,255,.7);
+            align-items: center; gap: 10px;
+        }
+        .hint.show { display: flex; }
+        .hint kbd {
+            display: inline-block; padding: 2px 8px; font-family: inherit; font-size: 12px;
+            background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+            border-radius: 4px; color: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.3);
+        }
+        .hint button {
+            margin-left: auto; background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            color: #fff; border: none; padding: 6px 14px; border-radius: 6px;
+            font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity .15s;
+        }
+        .hint button:hover { opacity: .85; }
+
+        .result-row {
+            display: none; align-items: center; gap: 20px; margin-bottom: 20px;
+            padding: 12px 20px; background: rgba(96,165,250,.1); border-radius: 12px;
+            border: 1px solid rgba(96,165,250,.15);
+        }
+        .result-row.show { display: flex; flex-wrap: wrap; }
+        .result-row .stat { display: flex; align-items: baseline; gap: 6px; }
+        .result-row .label { font-size: 13px; color: rgba(255,255,255,.45); }
+        .result-row .num { font-size: 28px; font-weight: 700; }
+        .result-row .num.raw { color: #fb923c; }
+        .result-row .num.dedup { color: #60a5fa; }
+        .result-row .sep { width: 1px; height: 28px; background: rgba(255,255,255,.1); }
+
+        .spinner-wrap { display: none; justify-content: center; padding: 40px 0; }
+        .spinner-wrap.show { display: flex; }
+        .spinner {
+            width: 32px; height: 32px; border: 3px solid rgba(255,255,255,.08);
+            border-top-color: #60a5fa; border-radius: 50%; animation: spin .7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .slider-wrap { display: none; margin-top: 4px; width: 100%; user-select: none; }
+        .slider-wrap.show { display: block; }
+        .img-comp {
+            position: relative; width: 100%; overflow: hidden; border-radius: 12px;
+            cursor: ew-resize; background: rgba(255,255,255,.03);
+        }
+        .img-comp img { display: block; width: 100%; }
+        .img-comp-overlay { position: absolute; inset: 0; overflow: hidden; border-radius: 12px; }
+        .img-comp-overlay img { display: block; height: 100%; width: auto; max-width: none; min-width: 100%; object-fit: cover; }
+        .img-comp-slider {
+            position: absolute; top: 0; bottom: 0; width: 3px;
+            background: rgba(255,255,255,.9); cursor: ew-resize;
+            box-shadow: 0 0 12px rgba(0,0,0,.5);
+        }
+        .img-comp-slider::before {
+            content: '\u2B9C\u2B9E'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%,-50%); font-size: 13px; color: #fff;
+            background: rgba(0,0,0,.55); backdrop-filter: blur(8px);
+            border-radius: 24px; padding: 8px 10px; line-height: 1; letter-spacing: -3px;
+        }
+        .labels {
+            position: absolute; top: 14px; left: 14px; right: 14px;
+            pointer-events: none; font-size: 12px; font-weight: 500; letter-spacing: .3px;
+            color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.6);
+        }
+        .labels .right { position: absolute; right: 14px; }
+
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85);
+            backdrop-filter: blur(8px); z-index: 1000;
+            justify-content: center; align-items: center; padding: 24px; cursor: zoom-out;
+        }
+        .modal.show { display: flex; }
+        .modal img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+
+        .error {
+            display: none; margin-top: 16px; padding: 12px 18px;
+            background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.2);
+            color: #fca5a5; border-radius: 10px; font-size: 14px;
+        }
+        .error.show { display: block; }
+
+        .llm-output {
+            display: none; margin-top: 16px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.08); overflow: hidden;
+            background: rgba(255,255,255,.04);
+        }
+        .llm-output.show { display: block; }
+        .llm-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 16px; cursor: pointer; user-select: none;
+            font-size: 13px; font-weight: 500; color: rgba(255,255,255,.6);
+            transition: background .15s;
+        }
+        .llm-header:hover { background: rgba(255,255,255,.04); }
+        .llm-arrow { transition: transform .2s; font-size: 10px; }
+        .llm-arrow.open { transform: rotate(180deg); }
+        .llm-body { display: none; border-top: 1px solid rgba(255,255,255,.06); }
+        .llm-body.open { display: block; }
+        .llm-body textarea {
+            width: 100%; min-height: 120px; padding: 12px 14px; border: none; resize: vertical;
+            background: rgba(0,0,0,.25); color: rgba(255,255,255,.85);
+            font-family: 'JetBrains Mono', 'Consolas', monospace; font-size: 12px; line-height: 1.6;
+            outline: none;
+        }
+        .llm-body button {
+            display: block; margin: 8px 12px 10px auto; padding: 6px 16px;
+            background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 6px; font-size: 12px; cursor: pointer; transition: background .15s;
+        }
+        .llm-body button:hover { background: rgba(255,255,255,.14); }
+        .llm-body button.copied { background: rgba(34,197,94,.2); border-color: rgba(34,197,94,.3); color: #4ade80; }
+
+        .dl-row { display: none; margin-top: 12px; }
+        .dl-row.show { display: flex; justify-content: flex-end; gap: 10px; }
+        .dl-row button {
+            padding: 8px 18px; background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 500;
+            cursor: pointer; transition: opacity .15s;
+        }
+        .dl-row button:hover { opacity: .85; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Isogam Counter</h1>
+
+        <div class="model-row">
+            <label for="modelSelect">Model</label>
+            <select id="modelSelect"></select>
+        </div>
+
+        <div class="conf-row">
+            <label for="confSlider">Confidence threshold</label>
+            <input type="range" id="confSlider" min="0" max="100" value="50">
+            <span class="val" id="confVal">0.50</span>
+        </div>
+
+        <div class="conf-row">
+            <label for="iouSlider">IoU threshold</label>
+            <input type="range" id="iouSlider" min="0" max="100" value="70">
+            <span class="val" id="iouVal">0.70</span>
+        </div>
+
+        <div class="conf-row">
+            <label for="imgszSlider">Image size</label>
+            <input type="range" id="imgszSlider" min="0" max="1920" step="32" value="0">
+            <span class="val" id="imgszVal">auto</span>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+            <p>Drop image here or click to browse<small>Supports jpg, png, webp and other image formats</small></p>
+        </div>
+
+        <div class="hint" id="hint">
+            Press <kbd>Enter</kbd> to run detection
+            <button id="detectBtn">Detect</button>
+        </div>
+
+        <div class="spinner-wrap" id="spinnerWrap">
+            <div class="spinner"></div>
+        </div>
+
+        <div class="result-row" id="resultRow">
+            <div class="stat">
+                <span class="label">Actual objects</span>
+                <span class="num dedup" id="dedupText">0</span>
+            </div>
+            <div class="sep"></div>
+            <div class="stat">
+                <span class="label">Raw detections</span>
+                <span class="num raw" id="countText">0</span>
+            </div>
+        </div>
+
+        <div class="llm-output" id="llmOutput">
+            <div class="llm-header" id="llmToggle">
+                <span>Detection data for LLM</span>
+                <span class="llm-arrow" id="llmArrow">&#9660;</span>
+            </div>
+            <div class="llm-body" id="llmBody">
+                <textarea id="llmText" readonly></textarea>
+                <button id="copyBtn">Copy</button>
+            </div>
+        </div>
+
+        <div class="dl-row" id="dlRow">
+            <button id="downloadBboxBtn">Download bounding-box image</button>
+            <button id="downloadCircleBtn">Download center-circle image</button>
+        </div>
+
+        <div class="slider-wrap" id="sliderWrap">
+            <div class="img-comp" id="imgComp">
+                <div class="img-comp-base">
+                    <img id="originalImg" alt="Original">
+                </div>
+                <div class="img-comp-overlay" id="overlay">
+                    <img id="annotatedImg" alt="Detected">
+                </div>
+                <div class="img-comp-slider" id="slider"></div>
+                <div class="labels">
+                    <span>Original</span>
+                    <span class="right">Detected</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="error"></div>
+    </div>
+
+    <div class="modal" id="zoomModal">
+        <img id="zoomImg" alt="Zoom">
+    </div>
+
+    <script>
+        const modelSelect = document.getElementById('modelSelect');
+        const confSlider = document.getElementById('confSlider');
+        const confVal = document.getElementById('confVal');
+        const iouSlider = document.getElementById('iouSlider');
+        const iouVal = document.getElementById('iouVal');
+        const imgszSlider = document.getElementById('imgszSlider');
+        const imgszVal = document.getElementById('imgszVal');
+        const dropZone = document.getElementById('dropZone');
+        const hint = document.getElementById('hint');
+        const detectBtn = document.getElementById('detectBtn');
+
+        let lastFile = null;
+        let busy = false;
+        let lastBboxB64 = '';
+        let lastCircleB64 = '';
+
+        fetch('/models/').then(r => r.json()).then(data => {
+            data.models.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                modelSelect.appendChild(opt);
+            });
+        });
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) handleFile(fileInput.files[0]);
+        });
+
+        confSlider.addEventListener('input', () => {
+            confVal.textContent = (confSlider.value / 100).toFixed(2);
+        });
+
+        iouSlider.addEventListener('input', () => {
+            iouVal.textContent = (iouSlider.value / 100).toFixed(2);
+        });
+
+        imgszSlider.addEventListener('input', () => {
+            imgszVal.textContent = imgszSlider.value === '0' ? 'auto' : imgszSlider.value;
+        });
+
+        function handleFile(file) {
+            lastFile = file;
+            hint.classList.add('show');
+            document.getElementById('resultRow').classList.remove('show');
+            document.getElementById('sliderWrap').classList.remove('show');
+            document.getElementById('error').classList.remove('show');
+            document.getElementById('dlRow').classList.remove('show');
+        }
+
+        async function predict() {
+            if (!lastFile || busy) return;
+            busy = true;
+
+            document.getElementById('spinnerWrap').classList.add('show');
+            hint.classList.remove('show');
+
+            const formData = new FormData();
+            formData.append('file', lastFile);
+            formData.append('conf', confSlider.value / 100);
+            formData.append('iou', iouSlider.value / 100);
+            formData.append('imgsz', imgszSlider.value);
+            formData.append('model_name', modelSelect.value);
+
+            try {
+                const res = await fetch('/predict/', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error('Server error');
+                const data = await res.json();
+
+                document.getElementById('countText').textContent = data.count;
+                document.getElementById('dedupText').textContent = data.dedup_count;
+                lastBboxB64 = data.bbox_b64;
+                lastCircleB64 = data.circle_b64;
+                document.getElementById('originalImg').src = 'data:image/jpeg;base64,' + data.original_b64;
+                document.getElementById('annotatedImg').src = 'data:image/jpeg;base64,' + data.circle_b64;
+
+                document.getElementById('resultRow').classList.add('show');
+                document.getElementById('sliderWrap').classList.add('show');
+                initSlider();
+                hint.classList.add('show');
+                document.querySelector('#hint').firstChild.textContent = 'Press ';
+
+                const lines = data.detections.map((d, i) => {
+                    const b = d.bbox.map(v => Math.round(v));
+                    const dup = data.count - data.dedup_count > 0 ? '' : '';
+                    return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
+                });
+                const llmText = `Actual objects: ${data.dedup_count}\nRaw detections: ${data.count}\n${lines.join('\n')}`;
+                document.getElementById('llmText').value = llmText;
+                document.getElementById('llmOutput').classList.add('show');
+                document.getElementById('dlRow').classList.add('show');
+            } catch (err) {
+                document.getElementById('error').textContent = 'Error: ' + err.message;
+                document.getElementById('error').classList.add('show');
+                hint.classList.add('show');
+            } finally {
+                document.getElementById('spinnerWrap').classList.remove('show');
+                busy = false;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !busy && lastFile) {
+                e.preventDefault();
+                predict();
+            }
+        });
+
+        detectBtn.addEventListener('click', () => {
+            if (!busy && lastFile) predict();
+        });
+
+        let dragActive = false;
+
+        function initSlider() {
+            const comp = document.getElementById('imgComp');
+            const overlay = document.getElementById('overlay');
+            const slider = document.getElementById('slider');
+
+            function setPos(x) {
+                const rect = comp.getBoundingClientRect();
+                let pct = ((x - rect.left) / rect.width) * 100;
+                pct = Math.max(0, Math.min(100, pct));
+                overlay.style.width = pct + '%';
+                slider.style.left = pct + '%';
+            }
+
+            setPos(comp.getBoundingClientRect().width / 2 + comp.getBoundingClientRect().left);
+
+            comp.addEventListener('mousedown', (e) => { dragActive = true; setPos(e.clientX); });
+            document.addEventListener('mousemove', (e) => { if (dragActive) setPos(e.clientX); });
+            document.addEventListener('mouseup', () => { dragActive = false; });
+
+            comp.addEventListener('touchstart', (e) => { dragActive = true; setPos(e.touches[0].clientX); });
+            document.addEventListener('touchmove', (e) => { if (dragActive) setPos(e.touches[0].clientX); });
+            document.addEventListener('touchend', () => { dragActive = false; });
+
+            comp.addEventListener('click', () => {
+                const modal = document.getElementById('zoomModal');
+                document.getElementById('zoomImg').src = document.getElementById('originalImg').src;
+                modal.classList.add('show');
+                modal.onclick = () => modal.classList.remove('show');
+            });
+        }
+
+        document.getElementById('llmToggle').addEventListener('click', () => {
+            const body = document.getElementById('llmBody');
+            const arrow = document.getElementById('llmArrow');
+            body.classList.toggle('open');
+            arrow.classList.toggle('open');
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const ta = document.getElementById('llmText');
+            ta.select();
+            navigator.clipboard.writeText(ta.value).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+            });
+        });
+
+        function downloadB64(b64, name) {
+            const a = document.createElement('a');
+            a.href = 'data:image/jpeg;base64,' + b64;
+            a.download = name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        document.getElementById('downloadBboxBtn').addEventListener('click', () => {
+            downloadB64(lastBboxB64, 'bbox-annotated.jpg');
+        });
+
+        document.getElementById('downloadCircleBtn').addEventListener('click', () => {
+            downloadB64(lastCircleB64, 'circle-annotated.jpg');
+        });
+    </script>
+</body>
+</html>
