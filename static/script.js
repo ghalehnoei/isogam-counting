@@ -1,0 +1,228 @@
+const modelSelect = document.getElementById('modelSelect');
+const confSlider = document.getElementById('confSlider');
+const confVal = document.getElementById('confVal');
+const iouSlider = document.getElementById('iouSlider');
+const iouVal = document.getElementById('iouVal');
+const imgszSlider = document.getElementById('imgszSlider');
+const imgszVal = document.getElementById('imgszVal');
+const includeLowConf = document.getElementById('includeLowConf');
+const lowConfImages = document.getElementById('lowConfImages');
+const lowConfBboxImg = document.getElementById('lowConfBboxImg');
+const lowConfCircleImg = document.getElementById('lowConfCircleImg');
+const dropZone = document.getElementById('dropZone');
+const hint = document.getElementById('hint');
+const detectBtn = document.getElementById('detectBtn');
+
+let lastFile = null;
+let busy = false;
+let lastBboxB64 = '';
+let lastCircleB64 = '';
+let lastLowConfBboxB64 = '';
+let lastLowConfCircleB64 = '';
+
+fetch('/models/').then(r => r.json()).then(data => {
+    data.models.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        modelSelect.appendChild(opt);
+    });
+});
+
+const fileInput = document.createElement('input');
+fileInput.type = 'file';
+fileInput.accept = 'image/*';
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+});
+
+confSlider.addEventListener('input', () => {
+    confVal.textContent = (confSlider.value / 100).toFixed(2);
+});
+
+iouSlider.addEventListener('input', () => {
+    iouVal.textContent = (iouSlider.value / 100).toFixed(2);
+});
+
+imgszSlider.addEventListener('input', () => {
+    imgszVal.textContent = imgszSlider.value === '0' ? 'auto' : imgszSlider.value;
+});
+
+function handleFile(file) {
+    lastFile = file;
+    hint.classList.add('show');
+    document.getElementById('resultRow').classList.remove('show');
+    document.getElementById('sliderWrap').classList.remove('show');
+    document.getElementById('error').classList.remove('show');
+    document.getElementById('dlRow').classList.remove('show');
+}
+
+async function predict() {
+    if (!lastFile || busy) return;
+    busy = true;
+
+    document.getElementById('spinnerWrap').classList.add('show');
+    hint.classList.remove('show');
+
+    const formData = new FormData();
+    formData.append('file', lastFile);
+    formData.append('conf', confSlider.value / 100);
+    formData.append('iou', iouSlider.value / 100);
+    formData.append('include_low_conf', includeLowConf.checked);
+    formData.append('imgsz', imgszSlider.value);
+    formData.append('model_name', modelSelect.value);
+
+    try {
+        const res = await fetch('/predict/', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Server error');
+        const data = await res.json();
+
+        document.getElementById('countText').textContent = data.count;
+        document.getElementById('dedupText').textContent = data.filtered_count;
+        document.getElementById('lowConfText').textContent = data.low_conf_count;
+        lastBboxB64 = data.bbox_b64;
+        lastCircleB64 = data.circle_b64;
+        lastLowConfBboxB64 = data.low_conf_bbox_b64 || '';
+        lastLowConfCircleB64 = data.low_conf_circle_b64 || '';
+        document.getElementById('originalImg').src = 'data:image/jpeg;base64,' + data.original_b64;
+        document.getElementById('annotatedImg').src = 'data:image/jpeg;base64,' + data.circle_b64;
+
+        // Show/hide low confidence images section
+        if (data.low_conf_count > 0 && data.low_conf_bbox_b64) {
+            lowConfImages.classList.add('show');
+            lowConfBboxImg.src = 'data:image/jpeg;base64,' + data.low_conf_bbox_b64;
+            lowConfCircleImg.src = 'data:image/jpeg;base64,' + data.low_conf_circle_b64;
+        } else {
+            lowConfImages.classList.remove('show');
+        }
+
+        document.getElementById('resultRow').classList.add('show');
+        document.getElementById('sliderWrap').classList.add('show');
+        initSlider();
+        hint.classList.add('show');
+        document.querySelector('#hint').firstChild.textContent = 'Another detection? ';
+
+        const lines = data.detections.map((d, i) => {
+            const b = d.bbox.map(v => Math.round(v));
+            return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
+        });
+        const lowConfLines = data.low_conf_detections.map((d, i) => {
+            const b = d.bbox.map(v => Math.round(v));
+            return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence} (LOW)${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
+        });
+        const llmText = `Final count: ${data.filtered_count}\nLow confidence: ${data.low_conf_count}\nRaw detections: ${data.count}\n\nHigh confidence detections:\n${lines.join('\n')}\n\nLow confidence detections:\n${lowConfLines.join('\n')}`;
+        document.getElementById('llmText').value = llmText;
+        document.getElementById('llmOutput').classList.add('show');
+        document.getElementById('dlRow').classList.add('show');
+
+        // Add low confidence section
+        const lowConfSection = document.createElement('div');
+        lowConfSection.className = 'low-confidence-section';
+        lowConfSection.innerHTML = `
+            <h3>⚠️ Low Confidence Detections (${data.low_conf_count})</h3>
+            <ul>
+                ${data.low_conf_detections.map((d, i) => {
+                    const b = d.bbox.map(v => Math.round(v));
+                    return `<li><span class="low-tag">[${i + 1}]</span> bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}</li>`;
+                }).join('')}
+            </ul>
+        `;
+        const llmBody = document.getElementById('llmBody');
+        llmBody.appendChild(lowConfSection);
+    } catch (err) {
+        document.getElementById('error').textContent = '⚠️ Error: ' + err.message;
+        document.getElementById('error').classList.add('show');
+        hint.classList.add('show');
+    } finally {
+        document.getElementById('spinnerWrap').classList.remove('show');
+        busy = false;
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !busy && lastFile) {
+        e.preventDefault();
+        predict();
+    }
+});
+
+detectBtn.addEventListener('click', () => {
+    if (!busy && lastFile) predict();
+});
+
+let dragActive = false;
+
+function initSlider() {
+    const comp = document.getElementById('imgComp');
+    const overlay = document.getElementById('overlay');
+    const slider = document.getElementById('slider');
+
+    function setPos(x) {
+        const rect = comp.getBoundingClientRect();
+        let pct = ((x - rect.left) / rect.width) * 100;
+        pct = Math.max(0, Math.min(100, pct));
+        overlay.style.width = pct + '%';
+        slider.style.left = pct + '%';
+    }
+
+    setPos(comp.getBoundingClientRect().width / 2 + comp.getBoundingClientRect().left);
+
+    comp.addEventListener('mousedown', (e) => { dragActive = true; setPos(e.clientX); });
+    document.addEventListener('mousemove', (e) => { if (dragActive) setPos(e.clientX); });
+    document.addEventListener('mouseup', () => { dragActive = false; });
+
+    comp.addEventListener('touchstart', (e) => { dragActive = true; setPos(e.touches[0].clientX); });
+    document.addEventListener('touchmove', (e) => { if (dragActive) setPos(e.touches[0].clientX); });
+    document.addEventListener('touchend', () => { dragActive = false; });
+
+    comp.addEventListener('click', () => {
+        const modal = document.getElementById('zoomModal');
+        document.getElementById('zoomImg').src = document.getElementById('originalImg').src;
+        modal.classList.add('show');
+        modal.onclick = () => modal.classList.remove('show');
+    });
+}
+
+document.getElementById('llmToggle').addEventListener('click', () => {
+    const body = document.getElementById('llmBody');
+    const arrow = document.getElementById('llmArrow');
+    body.classList.toggle('open');
+    arrow.classList.toggle('open');
+});
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+    const ta = document.getElementById('llmText');
+    ta.select();
+    navigator.clipboard.writeText(ta.value).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+});
+
+function downloadB64(b64, name) {
+    const a = document.createElement('a');
+    a.href = 'data:image/jpeg;base64,' + b64;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+document.getElementById('downloadBboxBtn').addEventListener('click', () => {
+    downloadB64(lastBboxB64, 'bbox-annotated.jpg');
+});
+
+document.getElementById('downloadCircleBtn').addEventListener('click', () => {
+    downloadB64(lastCircleB64, 'circle-annotated.jpg');
+});

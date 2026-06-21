@@ -7,509 +7,68 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Isogam Counter</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        html { font-size: 16px; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
-            min-height: 100vh; display: flex; justify-content: center; align-items: flex-start;
-            padding: 16px;
-            padding-top: max(16px, env(safe-area-inset-top));
-            padding-left: max(16px, env(safe-area-inset-left));
-            padding-right: max(16px, env(safe-area-inset-right));
-            padding-bottom: max(16px, env(safe-area-inset-bottom));
-        }
-        .container {
-            background: rgba(255,255,255,.06);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,.08);
-            border-radius: 20px; padding: 24px; max-width: 960px; width: 100%;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,.5);
-        }
-        h1 {
-            font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -.3px;
-            display: flex; align-items: center; gap: 10px; margin-bottom: 24px;
-        }
-        h1::before {
-            content: ''; display: inline-block; width: 6px; height: 24px;
-            background: linear-gradient(180deg, #60a5fa, #a78bfa); border-radius: 3px;
-        }
-
-        /* Controls Grid */
-        .controls-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .control-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .control-item label {
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(255,255,255,.6);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .control-item select,
-        .control-item input[type=range] {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.06);
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            appearance: auto;
-            -webkit-appearance: auto;
-            min-height: 44px;
-        }
-        .control-item select { cursor: pointer; }
-        .control-item select option { background: #1a1a2e; color: #fff; }
-        
-        .slider-value {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            color: rgba(255,255,255,.5);
-        }
-        .slider-value .val {
-            font-size: 16px;
-            font-weight: 600;
-            color: #60a5fa;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .control-item input[type=range] {
-            -webkit-appearance: none;
-            appearance: none;
-            height: 6px;
-            border: none;
-            padding: 0;
-            background: rgba(255,255,255,.15);
-            border-radius: 3px;
-        }
-        .control-item input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #60a5fa, #a78bfa);
-            cursor: pointer;
-            box-shadow: 0 0 12px rgba(96,165,250,.4);
-        }
-        .control-item input[type=range]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #60a5fa, #a78bfa);
-            cursor: pointer;
-            box-shadow: 0 0 12px rgba(96,165,250,.4);
-            border: none;
-        }
-
-        /* Drop Zone */
-        .drop-zone {
-            border: 2px dashed rgba(255,255,255,.18);
-            border-radius: 16px;
-            padding: 40px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all .25s ease;
-            background: rgba(255,255,255,.02);
-            min-height: 140px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        @media (min-height: 600px) {
-            .drop-zone { min-height: 160px; }
-        }
-        .drop-zone:hover, .drop-zone.dragover {
-            border-color: #60a5fa;
-            background: rgba(96,165,250,.06);
-            box-shadow: 0 0 30px rgba(96,165,250,.1);
-        }
-        .drop-zone p {
-            color: rgba(255,255,255,.6);
-            font-size: 16px;
-            font-weight: 500;
-            margin: 0;
-        }
-        .drop-zone p small {
-            color: rgba(255,255,255,.4);
-            display: block;
-            margin-top: 8px;
-            font-size: 13px;
-        }
-
-        /* Hint */
-        .hint {
-            display: none;
-            margin-top: 16px;
-            padding: 12px 16px;
-            background: rgba(96,165,250,.1);
-            border: 1px solid rgba(96,165,250,.2);
-            border-radius: 10px;
-            font-size: 13px;
-            color: rgba(255,255,255,.8);
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-        .hint.show { display: flex; }
-        .hint kbd {
-            display: inline-block;
-            padding: 4px 10px;
-            font-family: inherit;
-            font-size: 12px;
-            background: rgba(255,255,255,.12);
-            border: 1px solid rgba(255,255,255,.18);
-            border-radius: 4px;
-            color: #fff;
-            box-shadow: 0 1px 0 rgba(0,0,0,.3);
-        }
-        .hint button {
-            background: linear-gradient(135deg, #60a5fa, #a78bfa);
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity .15s;
-            min-height: 44px;
-            touch-action: manipulation;
-        }
-        .hint button:hover { opacity: .85; }
-        .hint button:active { opacity: .7; }
-
-        /* Spinner */
-        .spinner-wrap {
-            display: none;
-            justify-content: center;
-            padding: 40px 0;
-        }
-        .spinner-wrap.show { display: flex; }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,.08);
-            border-top-color: #60a5fa;
-            border-radius: 50%;
-            animation: spin .7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Results */
-        .result-row {
-            display: none;
-            gap: 16px;
-            margin-bottom: 20px;
-            padding: 16px;
-            background: rgba(96,165,250,.1);
-            border-radius: 12px;
-            border: 1px solid rgba(96,165,250,.15);
-            flex-wrap: wrap;
-        }
-        .result-row.show { display: flex; }
-        @media (max-width: 480px) {
-            .result-row { flex-direction: column; }
-        }
-        .result-row .stat {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-            min-width: 120px;
-        }
-        .result-row .label {
-            font-size: 12px;
-            color: rgba(255,255,255,.5);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .result-row .num {
-            font-size: 32px;
-            font-weight: 700;
-        }
-        .result-row .num.raw { color: #fb923c; }
-        .result-row .num.dedup { color: #60a5fa; }
-        .result-row .sep {
-            width: 100%;
-            height: 1px;
-            background: rgba(255,255,255,.1);
-        }
-        @media (min-width: 481px) {
-            .result-row { flex-direction: row; align-items: center; }
-            .result-row .sep {
-                width: 1px;
-                height: 32px;
-            }
-        }
-
-        /* Image Slider */
-        .slider-wrap {
-            display: none;
-            margin-top: 20px;
-            width: 100%;
-            user-select: none;
-        }
-        .slider-wrap.show { display: block; }
-        .img-comp {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 12px;
-            cursor: ew-resize;
-            touch-action: none;
-            background: rgba(255,255,255,.03);
-        }
-        .img-comp img {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
-        .img-comp-base { width: 100%; }
-        .img-comp-overlay {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            border-radius: 12px;
-        }
-        .img-comp-overlay img {
-            display: block;
-            height: 100%;
-            width: auto;
-            max-width: none;
-            min-width: 100%;
-            object-fit: cover;
-        }
-        .img-comp-slider {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: rgba(255,255,255,.9);
-            cursor: ew-resize;
-            box-shadow: 0 0 12px rgba(0,0,0,.5);
-        }
-        .img-comp-slider::before {
-            content: '\u2B9C\u2B9E';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
-            font-size: 14px;
-            color: #fff;
-            background: rgba(0,0,0,.6);
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            padding: 8px 12px;
-            line-height: 1;
-            letter-spacing: -3px;
-            white-space: nowrap;
-        }
-        .labels {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            right: 12px;
-            pointer-events: none;
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: .3px;
-            color: #fff;
-            text-shadow: 0 2px 8px rgba(0,0,0,.6);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.9);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            cursor: zoom-out;
-        }
-        .modal.show { display: flex; }
-        .modal img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        /* Error */
-        .error {
-            display: none;
-            margin-top: 16px;
-            padding: 12px 16px;
-            background: rgba(239,68,68,.12);
-            border: 1px solid rgba(239,68,68,.2);
-            color: #fca5a5;
-            border-radius: 10px;
-            font-size: 14px;
-        }
-        .error.show { display: block; }
-
-        /* LLM Output */
-        .llm-output {
-            display: none;
-            margin-top: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,.08);
-            overflow: hidden;
-            background: rgba(255,255,255,.04);
-        }
-        .llm-output.show { display: block; }
-        .llm-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            cursor: pointer;
-            user-select: none;
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(255,255,255,.7);
-            transition: background .15s;
-            min-height: 44px;
-            touch-action: manipulation;
-        }
-        .llm-header:hover { background: rgba(255,255,255,.04); }
-        .llm-header:active { background: rgba(255,255,255,.08); }
-        .llm-arrow {
-            transition: transform .2s;
-            font-size: 12px;
-        }
-        .llm-arrow.open { transform: rotate(180deg); }
-        .llm-body {
-            display: none;
-            border-top: 1px solid rgba(255,255,255,.06);
-        }
-        .llm-body.open { display: block; }
-        .llm-body textarea {
-            width: 100%;
-            min-height: 140px;
-            padding: 12px 14px;
-            border: none;
-            resize: vertical;
-            background: rgba(0,0,0,.25);
-            color: rgba(255,255,255,.85);
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            font-size: 12px;
-            line-height: 1.6;
-            outline: none;
-        }
-        .llm-body button {
-            display: block;
-            margin: 8px 12px 12px auto;
-            padding: 8px 16px;
-            background: rgba(255,255,255,.08);
-            color: rgba(255,255,255,.7);
-            border: 1px solid rgba(255,255,255,.1);
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background .15s;
-            min-height: 40px;
-            touch-action: manipulation;
-        }
-        .llm-body button:hover { background: rgba(255,255,255,.14); }
-        .llm-body button:active { background: rgba(255,255,255,.1); }
-        .llm-body button.copied {
-            background: rgba(34,197,94,.2);
-            border-color: rgba(34,197,94,.3);
-            color: #4ade80;
-        }
-
-        /* Download Buttons */
-        .dl-row {
-            display: none;
-            margin-top: 16px;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .dl-row.show { display: flex; }
-        @media (min-width: 481px) {
-            .dl-row { flex-direction: row; justify-content: flex-end; }
-        }
-        .dl-row button {
-            padding: 12px 18px;
-            background: linear-gradient(135deg, #60a5fa, #a78bfa);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: opacity .15s;
-            min-height: 44px;
-            flex: 1;
-            touch-action: manipulation;
-        }
-        @media (min-width: 481px) {
-            .dl-row button { flex: auto; }
-        }
-        .dl-row button:hover { opacity: .85; }
-        .dl-row button:active { opacity: .7; }
-
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
-            .container { padding: 16px; border-radius: 16px; }
-            h1 { font-size: 20px; margin-bottom: 20px; }
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
         <h1>Isogam Counter</h1>
 
-        <div class="controls-grid">
-            <div class="control-item">
-                <label for="modelSelect">Model</label>
-                <select id="modelSelect"></select>
-            </div>
-
-            <div class="control-item">
-                <div class="slider-value">
-                    <label for="confSlider">Confidence threshold</label>
-                    <span class="val" id="confVal">0.25</span>
+        <div class="controls-section">
+            <div class="controls-grid">
+                <!-- Model Selection -->
+                <div class="control-group">
+                    <div class="control-group-header">
+                        <span class="icon">🎯</span>
+                        <h2>Model Selection</h2>
+                    </div>
+                    <div class="control-item">
+                        <label for="modelSelect">Select Model</label>
+                        <select id="modelSelect"></select>
+                    </div>
                 </div>
-                <input type="range" id="confSlider" min="0" max="100" value="25">
-            </div>
 
-            <div class="control-item">
-                <div class="slider-value">
-                    <label for="iouSlider">IoU threshold</label>
-                    <span class="val" id="iouVal">0.70</span>
+                <!-- Detection Thresholds -->
+                <div class="control-group">
+                    <div class="control-group-header">
+                        <span class="icon">⚙️</span>
+                        <h2>Detection Thresholds</h2>
+                    </div>
+                    <div class="control-item">
+                        <div class="slider-value">
+                            <label for="confSlider">Confidence Threshold</label>
+                            <span class="val" id="confVal">0.25</span>
+                        </div>
+                        <input type="range" id="confSlider" min="0" max="100" value="25">
+                    </div>
+                    <div class="control-item">
+                        <div class="slider-value">
+                            <label for="iouSlider">IoU Threshold</label>
+                            <span class="val" id="iouVal">0.70</span>
+                        </div>
+                        <input type="range" id="iouSlider" min="0" max="100" value="70">
+                    </div>
                 </div>
-                <input type="range" id="iouSlider" min="0" max="100" value="70">
-            </div>
 
-            <div class="control-item">
-                <div class="slider-value">
-                    <label for="imgszSlider">Image size</label>
-                    <span class="val" id="imgszVal">auto</span>
+                <!-- Image Settings -->
+                <div class="control-group">
+                    <div class="control-group-header">
+                        <span class="icon">🖼️</span>
+                        <h2>Image Settings</h2>
+                    </div>
+                    <div class="control-item">
+                        <div class="slider-value">
+                            <label for="imgszSlider">Image Size</label>
+                            <span class="val" id="imgszVal">auto</span>
+                        </div>
+                        <input type="range" id="imgszSlider" min="0" max="1920" step="32" value="0">
+                    </div>
+                    <div class="control-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="includeLowConf" checked>
+                            <span class="toggle-text">Include Low Confidence Objects</span>
+                        </label>
+                    </div>
                 </div>
-                <input type="range" id="imgszSlider" min="0" max="1920" step="32" value="0">
             </div>
         </div>
 
@@ -528,8 +87,13 @@
 
         <div class="result-row" id="resultRow">
             <div class="stat">
-                <span class="label">Actual Objects</span>
+                <span class="label">Final Count</span>
                 <span class="num dedup" id="dedupText">0</span>
+            </div>
+            <div class="sep"></div>
+            <div class="stat">
+                <span class="label">Low Confidence</span>
+                <span class="num low" id="lowConfText">0</span>
             </div>
             <div class="sep"></div>
             <div class="stat">
@@ -552,16 +116,29 @@
         <div class="slider-wrap" id="sliderWrap">
             <div class="img-comp" id="imgComp">
                 <div class="img-comp-base">
-                    <img id="originalImg" alt="Original">
+                    <img id="sliderBaseImg" alt="Low Confidence (< 0.25)">
                 </div>
                 <div class="img-comp-overlay" id="overlay">
                     <img id="annotatedImg" alt="Detected">
                 </div>
                 <div class="img-comp-slider" id="slider"></div>
                 <div class="labels">
-                    <span>Original</span>
+                    <span>Low Conf (< 0.25)</span>
                     <span>Detected</span>
                 </div>
+            </div>
+        </div>
+
+        <div class="low-confidence-images" id="lowConfImages">
+            <div class="img-card">
+                <h3>🔴 Low Confidence Bounding Boxes</h3>
+                <img id="lowConfBboxImg" alt="Low Confidence Bounding Boxes">
+                <div class="count">Objects below threshold</div>
+            </div>
+            <div class="img-card">
+                <h3>🔴 Low Confidence Center Circles</h3>
+                <img id="lowConfCircleImg" alt="Low Confidence Center Circles">
+                <div class="count">Objects below threshold</div>
             </div>
         </div>
 
@@ -577,29 +154,39 @@
         <img id="zoomImg" alt="Zoom">
     </div>
 
-    <script>
-        const modelSelect = document.getElementById('modelSelect');
-        const confSlider = document.getElementById('confSlider');
-        const confVal = document.getElementById('confVal');
-        const iouSlider = document.getElementById('iouSlider');
-        const iouVal = document.getElementById('iouVal');
-        const imgszSlider = document.getElementById('imgszSlider');
-        const imgszVal = document.getElementById('imgszVal');
-        const dropZone = document.getElementById('dropZone');
-        const hint = document.getElementById('hint');
-        const detectBtn = document.getElementById('detectBtn');
+    <script src="/static/script.js"></script>
+</body>
+</html>
 
-        let lastFile = null;
-        let busy = false;
-        let lastBboxB64 = '';
-        let lastCircleB64 = '';
+<script>
+    const modelSelect = document.getElementById('modelSelect');
+    const confSlider = document.getElementById('confSlider');
+    const confVal = document.getElementById('confVal');
+    const iouSlider = document.getElementById('iouSlider');
+    const iouVal = document.getElementById('iouVal');
+    const imgszSlider = document.getElementById('imgszSlider');
+    const imgszVal = document.getElementById('imgszVal');
+    const includeLowConf = document.getElementById('includeLowConf');
+    const lowConfImages = document.getElementById('lowConfImages');
+    const lowConfBboxImg = document.getElementById('lowConfBboxImg');
+    const lowConfCircleImg = document.getElementById('lowConfCircleImg');
+    const dropZone = document.getElementById('dropZone');
+    const hint = document.getElementById('hint');
+    const detectBtn = document.getElementById('detectBtn');
 
-        fetch('/models/').then(r => r.json()).then(data => {
-            data.models.forEach(name => {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                modelSelect.appendChild(opt);
+    let lastFile = null;
+    let busy = false;
+    let lastBboxB64 = '';
+    let lastCircleB64 = '';
+    let lastLowConfBboxB64 = '';
+    let lastLowConfCircleB64 = '';
+
+    fetch('/models/').then(r => r.json()).then(data => {
+        data.models.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            modelSelect.appendChild(opt);
             });
         });
 
@@ -651,6 +238,7 @@
             formData.append('file', lastFile);
             formData.append('conf', confSlider.value / 100);
             formData.append('iou', iouSlider.value / 100);
+            formData.append('include_low_conf', includeLowConf.checked);
             formData.append('imgsz', imgszSlider.value);
             formData.append('model_name', modelSelect.value);
 
@@ -660,11 +248,24 @@
                 const data = await res.json();
 
                 document.getElementById('countText').textContent = data.count;
-                document.getElementById('dedupText').textContent = data.dedup_count;
+                document.getElementById('dedupText').textContent = data.filtered_count;
+                document.getElementById('lowConfText').textContent = data.low_conf_count;
                 lastBboxB64 = data.bbox_b64;
                 lastCircleB64 = data.circle_b64;
-                document.getElementById('originalImg').src = 'data:image/jpeg;base64,' + data.original_b64;
+                lastLowConfBboxB64 = data.low_conf_bbox_b64 || '';
+                lastLowConfCircleB64 = data.low_conf_circle_b64 || '';
+                document.getElementById('sliderBaseImg').src = 'data:image/jpeg;base64,' + data.low_conf_circle_b64;
+                document.getElementById('lowConfCircleImg').src = 'data:image/jpeg;base64,' + data.low_conf_circle_b64;
                 document.getElementById('annotatedImg').src = 'data:image/jpeg;base64,' + data.circle_b64;
+
+                // Show/hide low confidence images section
+                if (data.low_conf_count > 0 && data.low_conf_bbox_b64) {
+                    lowConfImages.classList.add('show');
+                    lowConfBboxImg.src = 'data:image/jpeg;base64,' + data.low_conf_bbox_b64;
+                    lowConfCircleImg.src = 'data:image/jpeg;base64,' + data.low_conf_circle_b64;
+                } else {
+                    lowConfImages.classList.remove('show');
+                }
 
                 document.getElementById('resultRow').classList.add('show');
                 document.getElementById('sliderWrap').classList.add('show');
@@ -676,10 +277,29 @@
                     const b = d.bbox.map(v => Math.round(v));
                     return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
                 });
-                const llmText = `Actual objects: ${data.dedup_count}\nRaw detections: ${data.count}\n${lines.join('\n')}`;
+                const lowConfLines = data.low_conf_detections.map((d, i) => {
+                    const b = d.bbox.map(v => Math.round(v));
+                    return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence} (LOW)${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
+                });
+                const llmText = `Final count: ${data.filtered_count}\nLow confidence: ${data.low_conf_count}\nRaw detections: ${data.count}\n\nHigh confidence detections:\n${lines.join('\n')}\n\nLow confidence detections:\n${lowConfLines.join('\n')}`;
                 document.getElementById('llmText').value = llmText;
                 document.getElementById('llmOutput').classList.add('show');
                 document.getElementById('dlRow').classList.add('show');
+
+                // Add low confidence section
+                const lowConfSection = document.createElement('div');
+                lowConfSection.className = 'low-confidence-section';
+                lowConfSection.innerHTML = `
+                    <h3>⚠️ Low Confidence Detections (${data.low_conf_count})</h3>
+                    <ul>
+                        ${data.low_conf_detections.map((d, i) => {
+                            const b = d.bbox.map(v => Math.round(v));
+                            return `<li><span class="low-tag">[${i + 1}]</span> bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}</li>`;
+                        }).join('')}
+                    </ul>
+                `;
+                const llmBody = document.getElementById('llmBody');
+                llmBody.appendChild(lowConfSection);
             } catch (err) {
                 document.getElementById('error').textContent = '⚠️ Error: ' + err.message;
                 document.getElementById('error').classList.add('show');
@@ -728,7 +348,7 @@
 
             comp.addEventListener('click', () => {
                 const modal = document.getElementById('zoomModal');
-                document.getElementById('zoomImg').src = document.getElementById('originalImg').src;
+                document.getElementById('zoomImg').src = document.getElementById('annotatedImg').src;
                 modal.classList.add('show');
                 modal.onclick = () => modal.classList.remove('show');
             });

@@ -47,7 +47,7 @@ def _img_to_b64(image: np.ndarray) -> str:
 
 
 @app.post("/predict/")
-async def predict(file: UploadFile = File(...), conf: float = Form(0.5), iou: float = Form(0.7), model_name: str = Form("isogam-pose.pt"), imgsz: int = Form(0)):
+async def predict(file: UploadFile = File(...), conf: float = Form(0.5), iou: float = Form(0.7), model_name: str = Form("YOLO26s-1920-150epoch.pt"), imgsz: int = Form(0), include_low_conf: bool = Form(True)):
     contents = await file.read()
     nparr = np.frombuffer(contents, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
@@ -56,18 +56,28 @@ async def predict(file: UploadFile = File(...), conf: float = Form(0.5), iou: fl
         return JSONResponse({"error": "Could not decode image"}, status_code=400)
 
     counter = _get_model(model_name)
-    kw = dict(conf=conf, iou=iou)
+    kw = dict(conf=conf, iou=iou, include_low_conf=include_low_conf)
     if imgsz:
         kw["imgsz"] = imgsz
     result = counter.count(image, **kw)
     annotated_bbox = counter.draw_annotations(image, **kw)
     annotated_circle = counter.draw_circle_annotations(image, **kw)
 
+    # Generate low confidence images (exclude low confidence objects)
+    kw_no_low_conf = {k: v for k, v in kw.items() if k != 'include_low_conf'}
+    low_conf_bbox = counter.draw_low_conf_bbox(image, **kw_no_low_conf)
+    low_conf_circle = counter.draw_low_conf_circle(image, **kw_no_low_conf)
+
     return JSONResponse({
         "count": result["count"],
         "dedup_count": result["dedup_count"],
+        "low_conf_count": result.get("low_conf_count", 0),
+        "low_conf_detections": result.get("low_conf_detections", []),
+        "filtered_count": result.get("filtered_count", result["count"]),
         "detections": result["detections"],
         "original_b64": _img_to_b64(image),
         "bbox_b64": _img_to_b64(annotated_bbox),
         "circle_b64": _img_to_b64(annotated_circle),
+        "low_conf_bbox_b64": _img_to_b64(low_conf_bbox),
+        "low_conf_circle_b64": _img_to_b64(low_conf_circle),
     })

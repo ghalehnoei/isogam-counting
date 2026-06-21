@@ -3,7 +3,7 @@ import cv2
 
 model = YOLO("models/YOLO26s-1920-150epoch.pt")
 
-cap = cv2.VideoCapture("videos/sample.mp4")
+cap = cv2.VideoCapture("warehouse.mp4")
 
 if not cap.isOpened():
     print("Error: Could not open video file")
@@ -14,7 +14,7 @@ h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 
 results = model.track(
-    source="videos/sample.mp4",
+    source="warehouse.mp4",
     tracker="bytetrack.yaml",
     conf=0.5,
     persist=True,
