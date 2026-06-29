@@ -1,393 +1,292 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#0f0f1a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Isogam Counter</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#09090B">
+  <title data-i18n="pageTitle">شمارشگر هوشمند ایزوگام</title>
+  <script>(function(){var d=localStorage.getItem('isogam_theme'),dark=d==='dark'||(d!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(dark)document.documentElement.classList.add('dark')})()</script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F5F5F5;
+      --bg-nav: rgba(245,245,245,0.85);
+      --bg-elevated: #FFFFFF;
+      --bg-subtle: #EFEFEF;
+      --bg-input: #E8E8EA;
+      --bg-kbd: #E4E4E7;
+      --bg-label: rgba(255,255,255,0.8);
+      --bg-overlay: rgba(255,255,255,0.92);
+      --text: #09090B;
+      --text2: #475569;
+      --text3: #71717A;
+      --border: #D4D4D8;
+      --border2: #A1A1AA;
+      --border3: #D4D4D8;
+      --handle: #27272A;
+      --divider: rgba(0,0,0,0.1);
+      --hero-from: rgba(0,0,0,0.04);
+      --shadow: rgba(0,0,0,0.06);
+      --error-bg: rgba(239,68,68,0.06);
+      --error-border: rgba(239,68,68,0.2);
+      --error-text: #B91C1C;
+    }
+    .dark {
+      --bg: #09090B;
+      --bg-nav: rgba(9,9,11,0.8);
+      --bg-elevated: rgba(39,39,42,0.2);
+      --bg-subtle: #0D0D0F;
+      --bg-input: rgba(39,39,42,0.4);
+      --bg-kbd: rgba(39,39,42,1);
+      --bg-label: rgba(0,0,0,0.4);
+      --bg-overlay: rgba(0,0,0,0.9);
+      --text: #FAFAFA;
+      --text2: #A1A1AA;
+      --text3: #52525B;
+      --border: rgba(255,255,255,0.05);
+      --border2: rgba(255,255,255,0.15);
+      --border3: rgba(255,255,255,0.1);
+      --handle: rgba(255,255,255,0.9);
+      --divider: rgba(255,255,255,0.05);
+      --hero-from: rgba(39,39,42,0.2);
+      --shadow: transparent;
+      --error-bg: rgba(239,68,68,0.1);
+      --error-border: rgba(239,68,68,0.2);
+      --error-text: #FCA5A5;
+    }
+    body { transition: background-color 0.3s ease-out, color 0.3s ease-out; }
+    @keyframes fade-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse-dot { 0%,100% { opacity: .4; } 50% { opacity: 1; } }
+    @keyframes count-pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes success-pulse { 0% { box-shadow: 0 0 0 0 rgba(249,115,22,0.4); } 70% { box-shadow: 0 0 0 12px rgba(249,115,22,0); } 100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); } }
+    .animate-fade-up { animation: fade-up 0.6s ease both; }
+    .animate-fade-in { animation: fade-in 0.8s ease both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    html { scroll-behavior: smooth; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #F97316; cursor: pointer; border: 2px solid var(--bg); box-shadow: 0 0 0 1px #F97316; transition: transform 0.15s ease-out; }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+    input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #F97316; cursor: pointer; border: 2px solid var(--bg); box-shadow: 0 0 0 1px #F97316; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      html { scroll-behavior: auto; }
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Isogam Counter</h1>
+<body id="appBody" class="bg-[var(--bg)] text-[var(--text)] antialiased">
 
-        <div class="controls-section">
-            <div class="controls-grid">
-                <!-- Model Selection -->
-                <div class="control-group">
-                    <div class="control-group-header">
-                        <span class="icon">🎯</span>
-                        <h2>Model Selection</h2>
-                    </div>
-                    <div class="control-item">
-                        <label for="modelSelect">Select Model</label>
-                        <select id="modelSelect"></select>
-                    </div>
-                </div>
+  <!-- Nav -->
+  <nav class="fixed top-3 inset-x-3 sm:top-4 sm:inset-x-4 z-50 bg-[var(--bg-nav)] backdrop-blur-lg border border-[var(--border)] rounded-xl shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,border-color 0.3s">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 h-11 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 font-semibold text-sm tracking-tight">
+        <span class="w-6 h-6 rounded-md bg-[#F97316] flex items-center justify-center text-[#09090B] font-bold text-[11px]">ای</span>
+        <span data-i18n="nav.brand">شمارشگر هوشمند ایزوگام</span>
+      </a>
+      <div class="flex items-center gap-3 text-sm text-[var(--text2)]">
+        <button id="themeToggle" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors" aria-label="Toggle theme">
+          <svg id="themeIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path class="sun" stroke-linecap="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            <path class="moon hidden" stroke-linecap="round" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+        <button id="langToggle" class="text-xs font-semibold text-[var(--text2)] hover:text-[var(--text)] transition-colors px-2 py-0.5 rounded border border-[var(--border)] hover:border-[var(--border2)] min-w-[32px] text-center">EN</button>
+        <a href="#features" class="hover:text-[var(--text)] transition-colors hidden sm:block" data-i18n="nav.features">امکانات</a>
+        <a href="#demo" class="hover:text-[var(--text)] transition-colors hidden sm:block" data-i18n="nav.demo">نمایش زنده</a>
+        <a href="https://github.com" target="_blank" class="hover:text-[var(--text)] transition-colors hidden sm:block">GitHub</a>
+        <a href="#demo" class="bg-[#F97316] text-[#09090B] px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#EA580C] transition-colors" data-i18n="nav.cta">شروع کنید</a>
+      </div>
+    </div>
+  </nav>
 
-                <!-- Detection Thresholds -->
-                <div class="control-group">
-                    <div class="control-group-header">
-                        <span class="icon">⚙️</span>
-                        <h2>Detection Thresholds</h2>
-                    </div>
-                    <div class="control-item">
-                        <div class="slider-value">
-                            <label for="confSlider">Confidence Threshold</label>
-                            <span class="val" id="confVal">0.25</span>
-                        </div>
-                        <input type="range" id="confSlider" min="0" max="100" value="25">
-                    </div>
-                    <div class="control-item">
-                        <div class="slider-value">
-                            <label for="iouSlider">IoU Threshold</label>
-                            <span class="val" id="iouVal">0.70</span>
-                        </div>
-                        <input type="range" id="iouSlider" min="0" max="100" value="70">
-                    </div>
-                </div>
-
-                <!-- Image Settings -->
-                <div class="control-group">
-                    <div class="control-group-header">
-                        <span class="icon">🖼️</span>
-                        <h2>Image Settings</h2>
-                    </div>
-                    <div class="control-item">
-                        <div class="slider-value">
-                            <label for="imgszSlider">Image Size</label>
-                            <span class="val" id="imgszVal">auto</span>
-                        </div>
-                        <input type="range" id="imgszSlider" min="0" max="1920" step="32" value="0">
-                    </div>
-                    <div class="control-item">
-                        <label class="toggle-label">
-                            <input type="checkbox" id="includeLowConf" checked>
-                            <span class="toggle-text">Include Low Confidence Objects</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="drop-zone" id="dropZone">
-            <p>📸 Drop image here or tap to upload<small>JPG, PNG, WebP and more</small></p>
-        </div>
-
-        <div class="hint" id="hint">
-            Press <kbd>Enter</kbd> to detect
-            <button id="detectBtn">Detect</button>
-        </div>
-
-        <div class="spinner-wrap" id="spinnerWrap">
-            <div class="spinner"></div>
-        </div>
-
-        <div class="result-row" id="resultRow">
-            <div class="stat">
-                <span class="label">Final Count</span>
-                <span class="num dedup" id="dedupText">0</span>
-            </div>
-            <div class="sep"></div>
-            <div class="stat">
-                <span class="label">Low Confidence</span>
-                <span class="num low" id="lowConfText">0</span>
-            </div>
-            <div class="sep"></div>
-            <div class="stat">
-                <span class="label">Raw Detections</span>
-                <span class="num raw" id="countText">0</span>
-            </div>
-        </div>
-
-        <div class="llm-output" id="llmOutput">
-            <div class="llm-header" id="llmToggle">
-                <span>Detection Data for LLM</span>
-                <span class="llm-arrow" id="llmArrow">▼</span>
-            </div>
-            <div class="llm-body" id="llmBody">
-                <textarea id="llmText" readonly></textarea>
-                <button id="copyBtn">Copy</button>
-            </div>
-        </div>
-
-        <div class="slider-wrap" id="sliderWrap">
-            <div class="img-comp" id="imgComp">
-                <div class="img-comp-base">
-                    <img id="sliderBaseImg" alt="Low Confidence (< 0.25)">
-                </div>
-                <div class="img-comp-overlay" id="overlay">
-                    <img id="annotatedImg" alt="Detected">
-                </div>
-                <div class="img-comp-slider" id="slider"></div>
-                <div class="labels">
-                    <span>Low Conf (< 0.25)</span>
-                    <span>Detected</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="low-confidence-images" id="lowConfImages">
-            <div class="img-card">
-                <h3>🔴 Low Confidence Bounding Boxes</h3>
-                <img id="lowConfBboxImg" alt="Low Confidence Bounding Boxes">
-                <div class="count">Objects below threshold</div>
-            </div>
-            <div class="img-card">
-                <h3>🔴 Low Confidence Center Circles</h3>
-                <img id="lowConfCircleImg" alt="Low Confidence Center Circles">
-                <div class="count">Objects below threshold</div>
-            </div>
-        </div>
-
-        <div class="dl-row" id="dlRow">
-            <button id="downloadBboxBtn">📥 Bounding Box</button>
-            <button id="downloadCircleBtn">📥 Center Circle</button>
-        </div>
-
-        <div class="error" id="error"></div>
+  <!-- Hero -->
+  <section class="pt-28 pb-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
+    <div class="animate-fade-up">
+      <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#F97316]/10 border border-[#F97316]/20 text-[#F97316] text-[11px] font-semibold tracking-wide mb-5">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#F97316]" style="animation:pulse-dot 2s ease-in-out infinite"></span>
+        <span data-i18n="hero.badge">قدرت‌گرفته از YOLO</span>
+      </span>
+    </div>
+    <h1 class="animate-fade-up delay-1 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.15] max-w-3xl mx-auto">
+      <span data-i18n="hero.title1">شمارش اشیا با</span><br>
+      <span class="text-transparent bg-clip-text bg-gradient-to-l from-[#F97316] to-[#FB923C]" data-i18n="hero.title2">دقت هوش مصنوعی</span>
+    </h1>
+    <p class="animate-fade-up delay-2 mt-3 text-[var(--text2)] text-sm sm:text-base max-w-xl mx-auto leading-relaxed" data-i18n="hero.subtitle">
+      تصویر خود را آپلود کنید و تعداد دقیق اشیا را با استفاده از جدیدترین مدل‌های تشخیص YOLO و حذف هوشمند اشیای تکراری دریافت کنید.
+    </p>
+    <div class="animate-fade-up delay-3 mt-5 flex flex-wrap justify-center gap-2.5">
+      <a href="#demo" class="bg-[#F97316] text-[#09090B] px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#EA580C] transition-all hover:-translate-y-0.5 shadow-lg shadow-[#F97316]/20" data-i18n="hero.cta1">امتحان کنید</a>
+      <a href="#features" class="border border-[var(--border2)] text-[var(--text2)] px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-[var(--border2)] hover:text-[var(--text)] transition-all" data-i18n="hero.cta2">مشاهده امکانات</a>
     </div>
 
-    <div class="modal" id="zoomModal">
-        <img id="zoomImg" alt="Zoom">
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+    <div class="text-center mb-6">
+      <span class="text-[#F97316] text-[10px] font-semibold tracking-widest uppercase" data-i18n="features.label">امکانات</span>
+      <h2 class="text-xl sm:text-2xl font-bold mt-1" data-i18n="features.title">همه‌چیز برای شمارش دقیق</h2>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
+        <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat1.title">قدرت YOLO</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat1.desc">استفاده از جدیدترین مدل‌های تشخیص YOLO برای شناسایی دقیق و بلادرنگ اشیا.</p>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
+        <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat2.title">حذف موارد تکراری</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat2.desc">تشخیص هوشمند اشیای هم‌پوشان با استفاده از آستانه IoU برای شمارش دقیق‌تر.</p>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
+        <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg></div>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat3.title">تشخیص نقاط کلیدی</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat3.desc">پشتیبانی از مدل‌های تشخیص حالت (Pose) با نمایش نقاط کلیدی روی تصویر.</p>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
+        <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg></div>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat4.title">مقایسه تصویری</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat4.desc">مقایسه تصویر اصلی و تصویر تحلیل‌شده با یک اسلایدر کشویی.</p>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
+        <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg></div>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat5.title">تنظیم آستانه‌ها</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat5.desc">تنظیم دقیق آستانه اطمینان و IoU با اسلایدرهای زنده.</p>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
+        <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat6.title">خروجی و دانلود</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat6.desc">دانلود تصاویر تحلیل‌شده و کپی داده‌های ساختاریافته برای استفاده در pipeline هوش مصنوعی.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="py-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+    <div class="text-center mb-5">
+      <span class="text-[#F97316] text-[10px] font-semibold tracking-widest uppercase" data-i18n="demo.label">نمایش زنده</span>
+      <h2 class="text-xl sm:text-2xl font-bold mt-1" data-i18n="demo.title">خودتان امتحان کنید</h2>
+      <p class="text-[var(--text2)] text-xs mt-1 max-w-lg mx-auto" data-i18n="demo.subtitle">یک تصویر بارگذاری کنید، تنظیمات را تغییر دهید و دکمه تشخیص را بزنید.</p>
     </div>
 
-    <script src="/static/script.js"></script>
-</body>
-</html>
+    <!-- Controls -->
+    <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 mb-3 shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,border-color 0.3s">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div>
+          <label class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider block mb-1" data-i18n="demo.model">مدل</label>
+          <select id="modelSelect" class="w-full bg-[var(--bg-input)] border border-[var(--border3)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text)] outline-none focus:border-[#F97316] appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2710%27 height=%2710%27 fill=%27%2371717A%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M8 11L3 6h10z%27/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:left 8px center;transition:background-color 0.3s,border-color 0.3s,color 0.3s"></select>
+        </div>
+        <div>
+          <label class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider block mb-1" data-i18n="demo.imgSize">سایز تصویر</label>
+          <div class="flex items-center gap-1.5">
+            <span id="imgszVal" class="text-[#22D3EE] text-[11px] font-['JetBrains_Mono',monospace] font-semibold min-w-[2.2rem] text-left">auto</span>
+            <input type="range" id="imgszSlider" min="0" max="1920" step="32" value="0" class="flex-1 h-[3px] bg-[var(--border2)] rounded-full appearance-none cursor-pointer outline-none" style="transition:background-color 0.3s">
+          </div>
+        </div>
+        <div>
+          <label class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider block mb-1" data-i18n="demo.confidence">اطمینان</label>
+          <div class="flex items-center gap-1.5">
+            <span id="confVal" class="text-[#22D3EE] text-[11px] font-['JetBrains_Mono',monospace] font-semibold min-w-[2.2rem] text-left">0.25</span>
+            <input type="range" id="confSlider" min="0" max="100" value="25" class="flex-1 h-[3px] bg-[var(--border2)] rounded-full appearance-none cursor-pointer outline-none" style="transition:background-color 0.3s">
+          </div>
+        </div>
+        <div>
+          <label class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider block mb-1" data-i18n="demo.iou">آستانه IoU</label>
+          <div class="flex items-center gap-1.5">
+            <span id="iouVal" class="text-[#22D3EE] text-[11px] font-['JetBrains_Mono',monospace] font-semibold min-w-[2.2rem] text-left">0.70</span>
+            <input type="range" id="iouSlider" min="0" max="100" value="70" class="flex-1 h-[3px] bg-[var(--border2)] rounded-full appearance-none cursor-pointer outline-none" style="transition:background-color 0.3s">
+          </div>
+        </div>
+      </div>
+    </div>
 
-<script>
-    const modelSelect = document.getElementById('modelSelect');
-    const confSlider = document.getElementById('confSlider');
-    const confVal = document.getElementById('confVal');
-    const iouSlider = document.getElementById('iouSlider');
-    const iouVal = document.getElementById('iouVal');
-    const imgszSlider = document.getElementById('imgszSlider');
-    const imgszVal = document.getElementById('imgszVal');
-    const includeLowConf = document.getElementById('includeLowConf');
-    const lowConfImages = document.getElementById('lowConfImages');
-    const lowConfBboxImg = document.getElementById('lowConfBboxImg');
-    const lowConfCircleImg = document.getElementById('lowConfCircleImg');
-    const dropZone = document.getElementById('dropZone');
-    const hint = document.getElementById('hint');
-    const detectBtn = document.getElementById('detectBtn');
+    <!-- Drop zone -->
+    <div id="dropZone" class="border-2 border-dashed border-[var(--border2)] rounded-lg py-6 px-4 text-center cursor-pointer transition-all hover:border-[#F97316] hover:bg-[#F97316]/[0.03] bg-[var(--bg-elevated)] min-h-[90px] flex flex-col items-center justify-center gap-1.5 shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,border-color 0.3s">
+      <svg class="w-8 h-8 text-[var(--text3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span class="text-[var(--text2)] text-xs font-medium" data-i18n="demo.drop">تصویر را اینجا رها کنید یا کلیک کنید</span>
+      <span class="text-[var(--text3)] text-[10px]" data-i18n="demo.dropHint">JPG, PNG, WebP و سایر فرمت‌ها</span>
+    </div>
 
-    let lastFile = null;
-    let busy = false;
-    let lastBboxB64 = '';
-    let lastCircleB64 = '';
-    let lastLowConfBboxB64 = '';
-    let lastLowConfCircleB64 = '';
+    <!-- Action bar -->
+    <div id="actionBar" class="hidden items-center gap-2 mt-3 px-3 py-2 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,border-color 0.3s">
+      <kbd class="font-['JetBrains_Mono',monospace] text-[10px] px-1.5 py-0.5 bg-[var(--bg-kbd)] border border-[var(--border2)] rounded text-[var(--text2)]" style="transition:background-color 0.3s,border-color 0.3s,color 0.3s">&#x23CE;</kbd>
+      <span id="actionBarText" class="text-[var(--text2)] text-xs">برای تشخیص دکمه Enter را بزنید</span>
+      <button id="detectBtn" class="mr-auto bg-[#F97316] text-[#09090B] px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider hover:bg-[#EA580C] transition-all" data-i18n="demo.detect">تشخیص</button>
+    </div>
 
-    fetch('/models/').then(r => r.json()).then(data => {
-        data.models.forEach(name => {
-            const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name;
-            modelSelect.appendChild(opt);
-            });
-        });
+    <!-- Spinner -->
+    <div id="spinnerWrap" class="hidden justify-center py-8">
+      <div class="w-6 h-6 border-2 border-[var(--border)] border-t-[#F97316] rounded-full" style="animation:spin 0.7s linear infinite;transition:border-color 0.3s"></div>
+    </div>
 
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
+    <!-- Stats -->
+    <div id="stats" class="hidden mt-4 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg overflow-hidden shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,border-color 0.3s">
+      <div class="flex flex-col sm:flex-row">
+        <div class="flex-1 px-4 py-3">
+          <span class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider" data-i18n="demo.finalCount">تعداد نهایی</span>
+          <div id="dedupText" class="text-[#F97316] text-2xl sm:text-3xl font-['JetBrains_Mono',monospace] font-bold leading-tight transition-all">0</div>
+        </div>
+        <div id="statsDivider" class="relative flex-1 px-4 py-3">
+          <span class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider" data-i18n="demo.rawDetections">تشخیص اولیه</span>
+          <div id="countText" class="text-[var(--text2)] text-2xl sm:text-3xl font-['JetBrains_Mono',monospace] font-bold leading-tight">0</div>
+        </div>
+      </div>
+    </div>
 
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length) handleFile(fileInput.files[0]);
-        });
+    <!-- Slider -->
+    <div id="sliderWrap" class="hidden mt-4">
+      <div id="imgComp" class="relative w-full overflow-hidden rounded-xl cursor-ew-resize touch-none bg-[var(--bg-subtle)] border border-[var(--border)]" style="max-height:70vh;transition:background-color 0.3s,border-color 0.3s">
+        <img id="sliderBaseImg" alt="Original" class="block w-full" style="max-height:70vh;object-fit:contain;object-position:top">
+        <img id="annotatedImg" alt="Detected" class="absolute top-0 left-0 w-full h-full" style="object-fit:contain;object-position:top;clip-path:inset(0 100% 0 0)">
+        <div id="slider" class="absolute top-0 bottom-0 w-[3px] bg-[var(--handle)] cursor-ew-resize shadow-lg z-10" style="left:50%;transition:background-color 0.3s"></div>
+        <div id="sliderLabels" class="absolute top-2 left-2 right-2 pointer-events-none flex justify-between z-10">
+          <span class="text-[10px] font-semibold text-[var(--text)] px-2 py-0.5 bg-[var(--bg-label)] rounded backdrop-blur-sm">تشخیص</span>
+          <span class="text-[10px] font-semibold text-[var(--text)] px-2 py-0.5 bg-[var(--bg-label)] rounded backdrop-blur-sm">اصلی</span>
+        </div>
+      </div>
+    </div>
 
-        confSlider.addEventListener('input', () => {
-            confVal.textContent = (confSlider.value / 100).toFixed(2);
-        });
+    <!-- LLM output -->
+    <div id="llmOutput" class="hidden mt-3 rounded-lg border border-[var(--border)] overflow-hidden bg-[var(--bg-elevated)] shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,border-color 0.3s">
+      <div id="llmToggle" class="flex justify-between items-center px-3 py-2.5 cursor-pointer select-none text-[var(--text2)] text-[11px] font-semibold uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors duration-200 ease-out min-h-[36px]">
+        <span data-i18n="demo.llmTitle">داده‌های تشخیص</span>
+        <span id="llmArrow" class="text-[9px] text-[var(--text3)] transition-transform duration-200">&#x25BC;</span>
+      </div>
+      <div id="llmBody" class="hidden border-t border-[var(--border)]" style="transition:border-color 0.3s">
+        <textarea id="llmText" readonly class="w-full min-h-[100px] px-3 py-2.5 border-none resize-y bg-[var(--bg-input)] text-[var(--text2)] font-['JetBrains_Mono',monospace] text-[11px] leading-relaxed outline-none" style="transition:background-color 0.3s,color 0.3s"></textarea>
+        <button id="copyBtn" class="block mr-auto ml-3 mb-3 mt-1.5 px-3 py-1 bg-transparent text-[var(--text3)] border border-[var(--border2)] rounded text-[9px] font-semibold uppercase tracking-wider hover:text-[var(--text)] hover:border-[var(--border2)] transition-all cursor-pointer" style="transition:color 0.3s,border-color 0.3s">کپی</button>
+      </div>
+    </div>
 
-        iouSlider.addEventListener('input', () => {
-            iouVal.textContent = (iouSlider.value / 100).toFixed(2);
-        });
+    <!-- Download buttons -->
+    <div id="dlRow" class="hidden mt-3 gap-2 flex-col sm:flex-row">
+      <button id="downloadBboxBtn" class="flex-1 px-3 py-2 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg text-[var(--text2)] text-[10px] font-semibold uppercase tracking-wider hover:text-[var(--text)] hover:border-[var(--border2)] transition-all shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,color 0.3s,border-color 0.3s">دانلود با کادر</button>
+      <button id="downloadCircleBtn" class="flex-1 px-3 py-2 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg text-[var(--text2)] text-[10px] font-semibold uppercase tracking-wider hover:text-[var(--text)] hover:border-[var(--border2)] transition-all shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,color 0.3s,border-color 0.3s">دانلود با دایره</button>
+    </div>
 
-        imgszSlider.addEventListener('input', () => {
-            imgszVal.textContent = imgszSlider.value === '0' ? 'auto' : imgszSlider.value;
-        });
+    <!-- Error -->
+    <div id="error" class="hidden mt-3 px-3 py-2 bg-[var(--error-bg)] border border-[var(--error-border)] text-[var(--error-text)] rounded-lg text-xs" style="transition:background-color 0.3s,border-color 0.3s,color 0.3s"></div>
+  </section>
 
-        function handleFile(file) {
-            lastFile = file;
-            hint.classList.add('show');
-            document.getElementById('resultRow').classList.remove('show');
-            document.getElementById('sliderWrap').classList.remove('show');
-            document.getElementById('error').classList.remove('show');
-            document.getElementById('dlRow').classList.remove('show');
-        }
+  <!-- Footer -->
+  <footer class="border-t border-[var(--border)] py-6 px-4 sm:px-6 lg:px-8 text-center text-[var(--text3)] text-[11px]" style="transition:background-color 0.3s,border-color 0.3s,color 0.3s">
+    <p class="flex items-center justify-center gap-2">
+      <span data-i18n="footer.text">ساخته‌شده با</span>
+      <a href="https://fastapi.tiangolo.com" class="text-[var(--text2)] hover:text-[var(--text)] transition-colors">FastAPI</a>
+      &amp; <a href="https://ultralytics.com/yolo" class="text-[var(--text2)] hover:text-[var(--text)] transition-colors">YOLO</a>
+    </p>
+  </footer>
 
-        async function predict() {
-            if (!lastFile || busy) return;
-            busy = true;
+  <!-- Zoom modal -->
+  <div id="zoomModal" class="hidden fixed inset-0 bg-[var(--bg-overlay)] backdrop-blur-md z-[1000] justify-center items-center p-5 cursor-zoom-out" style="transition:background-color 0.3s">
+    <img id="zoomImg" alt="Zoom" class="max-w-full max-h-full object-contain rounded-lg">
+  </div>
 
-            document.getElementById('spinnerWrap').classList.add('show');
-            hint.classList.remove('show');
-
-            const formData = new FormData();
-            formData.append('file', lastFile);
-            formData.append('conf', confSlider.value / 100);
-            formData.append('iou', iouSlider.value / 100);
-            formData.append('include_low_conf', includeLowConf.checked);
-            formData.append('imgsz', imgszSlider.value);
-            formData.append('model_name', modelSelect.value);
-
-            try {
-                const res = await fetch('/predict/', { method: 'POST', body: formData });
-                if (!res.ok) throw new Error('Server error');
-                const data = await res.json();
-
-                document.getElementById('countText').textContent = data.count;
-                document.getElementById('dedupText').textContent = data.filtered_count;
-                document.getElementById('lowConfText').textContent = data.low_conf_count;
-                lastBboxB64 = data.bbox_b64;
-                lastCircleB64 = data.circle_b64;
-                lastLowConfBboxB64 = data.low_conf_bbox_b64 || '';
-                lastLowConfCircleB64 = data.low_conf_circle_b64 || '';
-                document.getElementById('sliderBaseImg').src = 'data:image/jpeg;base64,' + data.low_conf_circle_b64;
-                document.getElementById('lowConfCircleImg').src = 'data:image/jpeg;base64,' + data.low_conf_circle_b64;
-                document.getElementById('annotatedImg').src = 'data:image/jpeg;base64,' + data.circle_b64;
-
-                // Show/hide low confidence images section
-                if (data.low_conf_count > 0 && data.low_conf_bbox_b64) {
-                    lowConfImages.classList.add('show');
-                    lowConfBboxImg.src = 'data:image/jpeg;base64,' + data.low_conf_bbox_b64;
-                    lowConfCircleImg.src = 'data:image/jpeg;base64,' + data.low_conf_circle_b64;
-                } else {
-                    lowConfImages.classList.remove('show');
-                }
-
-                document.getElementById('resultRow').classList.add('show');
-                document.getElementById('sliderWrap').classList.add('show');
-                initSlider();
-                hint.classList.add('show');
-                document.querySelector('#hint').firstChild.textContent = 'Another detection? ';
-
-                const lines = data.detections.map((d, i) => {
-                    const b = d.bbox.map(v => Math.round(v));
-                    return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
-                });
-                const lowConfLines = data.low_conf_detections.map((d, i) => {
-                    const b = d.bbox.map(v => Math.round(v));
-                    return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence} (LOW)${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
-                });
-                const llmText = `Final count: ${data.filtered_count}\nLow confidence: ${data.low_conf_count}\nRaw detections: ${data.count}\n\nHigh confidence detections:\n${lines.join('\n')}\n\nLow confidence detections:\n${lowConfLines.join('\n')}`;
-                document.getElementById('llmText').value = llmText;
-                document.getElementById('llmOutput').classList.add('show');
-                document.getElementById('dlRow').classList.add('show');
-
-                // Add low confidence section
-                const lowConfSection = document.createElement('div');
-                lowConfSection.className = 'low-confidence-section';
-                lowConfSection.innerHTML = `
-                    <h3>⚠️ Low Confidence Detections (${data.low_conf_count})</h3>
-                    <ul>
-                        ${data.low_conf_detections.map((d, i) => {
-                            const b = d.bbox.map(v => Math.round(v));
-                            return `<li><span class="low-tag">[${i + 1}]</span> bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}</li>`;
-                        }).join('')}
-                    </ul>
-                `;
-                const llmBody = document.getElementById('llmBody');
-                llmBody.appendChild(lowConfSection);
-            } catch (err) {
-                document.getElementById('error').textContent = '⚠️ Error: ' + err.message;
-                document.getElementById('error').classList.add('show');
-                hint.classList.add('show');
-            } finally {
-                document.getElementById('spinnerWrap').classList.remove('show');
-                busy = false;
-            }
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !busy && lastFile) {
-                e.preventDefault();
-                predict();
-            }
-        });
-
-        detectBtn.addEventListener('click', () => {
-            if (!busy && lastFile) predict();
-        });
-
-        let dragActive = false;
-
-        function initSlider() {
-            const comp = document.getElementById('imgComp');
-            const overlay = document.getElementById('overlay');
-            const slider = document.getElementById('slider');
-
-            function setPos(x) {
-                const rect = comp.getBoundingClientRect();
-                let pct = ((x - rect.left) / rect.width) * 100;
-                pct = Math.max(0, Math.min(100, pct));
-                overlay.style.width = pct + '%';
-                slider.style.left = pct + '%';
-            }
-
-            setPos(comp.getBoundingClientRect().width / 2 + comp.getBoundingClientRect().left);
-
-            comp.addEventListener('mousedown', (e) => { dragActive = true; setPos(e.clientX); });
-            document.addEventListener('mousemove', (e) => { if (dragActive) setPos(e.clientX); });
-            document.addEventListener('mouseup', () => { dragActive = false; });
-
-            comp.addEventListener('touchstart', (e) => { dragActive = true; setPos(e.touches[0].clientX); });
-            document.addEventListener('touchmove', (e) => { if (dragActive) setPos(e.touches[0].clientX); });
-            document.addEventListener('touchend', () => { dragActive = false; });
-
-            comp.addEventListener('click', () => {
-                const modal = document.getElementById('zoomModal');
-                document.getElementById('zoomImg').src = document.getElementById('annotatedImg').src;
-                modal.classList.add('show');
-                modal.onclick = () => modal.classList.remove('show');
-            });
-        }
-
-        document.getElementById('llmToggle').addEventListener('click', () => {
-            const body = document.getElementById('llmBody');
-            const arrow = document.getElementById('llmArrow');
-            body.classList.toggle('open');
-            arrow.classList.toggle('open');
-        });
-
-        document.getElementById('copyBtn').addEventListener('click', () => {
-            const ta = document.getElementById('llmText');
-            ta.select();
-            navigator.clipboard.writeText(ta.value).then(() => {
-                const btn = document.getElementById('copyBtn');
-                btn.textContent = '✓ Copied!';
-                btn.classList.add('copied');
-                setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
-            });
-        });
-
-        function downloadB64(b64, name) {
-            const a = document.createElement('a');
-            a.href = 'data:image/jpeg;base64,' + b64;
-            a.download = name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        document.getElementById('downloadBboxBtn').addEventListener('click', () => {
-            downloadB64(lastBboxB64, 'bbox-annotated.jpg');
-        });
-
-        document.getElementById('downloadCircleBtn').addEventListener('click', () => {
-            downloadB64(lastCircleB64, 'circle-annotated.jpg');
-        });
-    </script>
+  <script src="/static/script.js"></script>
 </body>
 </html>
