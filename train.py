@@ -6,10 +6,10 @@ import os
 def main():
     # --- Edit these to match your setup ---
     task = "detect"          # "pose" or "detect"
-    model_size = "11x"       # Model size: 11n, 11s, 11m, 11l, 11x, 26s, 26l, etc.
+    model_size = "11l"       # Model size: 11n, 11s, 11m, 11l, 11x, 26s, 26l, etc.
     data_yaml = "./data/data.yaml"  # path to dataset YAML (relative or absolute)
     epochs = 200
-    imgsz = 1920
+    imgsz = 1280
     batch_size = 2
     device = 0               # 0 for GPU, "cpu" or -1 for CPU
     project_name = "runs/train"
@@ -19,13 +19,13 @@ def main():
     workers = 8              # dataloader workers
     patience = 30            # early stopping patience
     save_period = 10         # checkpoint every N epochs
-    amp = True               # mixed precision
+    amp = False               # mixed precision
     optimizer = "AdamW"      # auto, SGD, Adam, AdamW
     close_mosaic = 10        # disable mosaic augmentation last N epochs
     resume_last = False      # if True and output folder exists, resume from last checkpoint
     
     # Learning rate and weight decay
-    lr0 = 0.001
+    lr0 = 0.0005
     weight_decay = 0.0005
     cos_lr = True
     
@@ -37,7 +37,7 @@ def main():
     translate = 0.05
     scale = 0.2
     fliplr = 0.5
-    mosaic = 1.0
+    mosaic = 0.0
     mixup = 0.0
     # --- End of config ---
 
