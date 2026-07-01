@@ -6,13 +6,13 @@ import os
 def main():
     # --- Edit these to match your setup ---
     task = "detect"          # "pose" or "detect"
-    model_size = "11l"       # Model size: 11n, 11s, 11m, 11l, 11x, 26s, 26l, etc.
+    model_size = "11s"       # Model size: 11n, 11s, 11m, 11l, 11x, 26s, 26l, etc.
     data_yaml = "./data/data.yaml"  # path to dataset YAML (relative or absolute)
     epochs = 200
-    imgsz = 1280
+    imgsz = 1920
     batch_size = 2
     device = 0               # 0 for GPU, "cpu" or -1 for CPU
-    project_name = "runs/train"
+    project_name = "./runs/train"
     name = "isogam"          # folder name under runs/
     pretrained = True        # False to train from scratch
     cache = "disk"           # "ram", "disk", or "" (no cache)

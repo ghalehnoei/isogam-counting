@@ -53,6 +53,7 @@ class PoseCounter:
             return {"count": 0, "dedup_count": 0, "detections": []}
 
         boxes_np = boxes.xyxy.cpu().numpy()
+        cls_ids = boxes.cls.cpu().numpy().astype(int).tolist() if boxes.cls is not None else []
         count = len(boxes_np)
         confs = boxes.conf.cpu().numpy()
         kpts_data = []
@@ -63,9 +64,12 @@ class PoseCounter:
 
         for i in range(count):
             conf_val = float(confs[i])
+            cid = cls_ids[i] if i < len(cls_ids) else 0
             detections.append({
                 "bbox": boxes_np[i].tolist(),
                 "confidence": round(conf_val, 3),
+                "class_id": cid,
+                "class_name": self.names.get(cid, str(cid)),
                 "keypoints": kpts_data[i] if kpts_data else [],
             })
 
@@ -100,9 +104,9 @@ class PoseCounter:
                 is_duplicate = i in overlapping
 
                 if is_duplicate:
-                    color = (0, 140, 255)  # Orange for duplicates
+                    color = (0, 140, 255)
                 else:
-                    color = (0, 0, 200)  # Blue for normal
+                    color = (0, 0, 200)
 
                 label = str(i + 1)
                 bw, bh = x2 - x1, y2 - y1
@@ -132,9 +136,9 @@ class PoseCounter:
                 is_duplicate = i in overlapping
 
                 if is_duplicate:
-                    color = (0, 140, 255)  # Orange for duplicates
+                    color = (0, 140, 255)
                 else:
-                    color = (0, 0, 200)  # Blue for normal
+                    color = (0, 0, 200)
 
                 label = str(i + 1)
                 bw, bh = x2 - x1, y2 - y1

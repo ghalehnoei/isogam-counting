@@ -24,7 +24,10 @@ def _get_model(model_name: str) -> PoseCounter:
     if model_name not in _models:
         model_path = MODEL_DIR / model_name
         if not model_path.exists():
-            raise ValueError(f"Model '{model_name}' not found")
+            matches = list(MODEL_DIR.rglob(model_name))
+            if not matches:
+                raise ValueError(f"Model '{model_name}' not found")
+            model_path = matches[0]
         _models[model_name] = PoseCounter(str(model_path))
     return _models[model_name]
 
@@ -37,8 +40,20 @@ async def index():
 
 @app.get("/models/")
 async def list_models():
-    models = sorted(f.name for f in MODEL_DIR.glob("*.pt"))
-    return {"models": models}
+    categories = {}
+    for cat_dir in sorted(MODEL_DIR.iterdir()):
+        if not cat_dir.is_dir():
+            continue
+        objects = {}
+        for obj_dir in sorted(cat_dir.iterdir()):
+            if not obj_dir.is_dir():
+                continue
+            models = sorted(f.name for f in obj_dir.glob("*.pt"))
+            if models:
+                objects[obj_dir.name] = models
+        if objects:
+            categories[cat_dir.name] = objects
+    return {"categories": categories}
 
 
 def _img_to_b64(image: np.ndarray) -> str:
@@ -67,6 +82,8 @@ async def predict(file: UploadFile = File(...), conf: float = Form(0.5), iou: fl
         "count": result["count"],
         "dedup_count": result["dedup_count"],
         "detections": result["detections"],
+        "class_names": counter.names,
+        "model_name": model_name,
         "original_b64": _img_to_b64(image),
         "bbox_b64": _img_to_b64(annotated_bbox),
         "circle_b64": _img_to_b64(annotated_circle),

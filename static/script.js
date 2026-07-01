@@ -27,17 +27,22 @@ const tr = {
     'feat5.desc': 'تنظیم دقیق اطمینان و IoU مخصوص هر شی برای نتیجه مطلوب.',
     'feat6.title': 'خروجی و دانلود',
     'feat6.desc': 'دانلود تصاویر تحلیل‌شده و داده‌های ساختاریافته برای هر شی.',
-    'objects.label': 'اشیاء',
-    'objects.title': 'چه چیزهایی می‌توانید بشمارید؟',
-    'objects.subtitle': 'هر شی مدل اختصاصی خود را دارد. اکنون ایزوگام فعال است — به‌زودی موارد جدید اضافه می‌شود.',
-    'objects.obj1': 'ایزوگام',
+    'objects.label': 'دسته‌بندی‌ها',
+    'objects.title': 'دسته مورد نظر را انتخاب کنید',
+    'objects.subtitle': 'دسته را انتخاب کنید، سپس شی مورد نظر را برای شمارش انتخاب نمایید.',
+    'objects.cat1': 'تولید',
+    'objects.cat1Desc': 'Manufacturing',
+    'objects.cat2': 'انسان',
+    'objects.cat2Desc': 'Human',
+    'objects.cat3': 'حیوانات',
+    'objects.cat3Desc': 'Animals',
+    'objects.cat4': 'بیشتر',
+    'objects.cat4Desc': 'More coming soon',
     'objects.obj1Desc': 'همه‌منظوره',
-    'objects.obj2': 'شخص',
+    'objects.obj2': 'Person',
     'objects.obj2Desc': 'تشخیص افراد',
-    'objects.obj3': 'خودرو',
-    'objects.obj3Desc': 'تشخیص خودرو',
-    'objects.obj4': 'حیوان',
-    'objects.obj4Desc': 'تشخیص حیوانات',
+    'objects.obj3': 'Animal',
+    'objects.obj3Desc': 'تشخیص حیوانات',
     'demo.label': 'نمایش زنده',
     'demo.title': 'خودتان امتحان کنید',
     'demo.subtitle': 'شی مورد نظر را انتخاب کنید، تصویر را بارگذاری کنید و نتیجه را ببینید.',
@@ -54,6 +59,7 @@ const tr = {
     'demo.rawDetections': 'تشخیص اولیه',
     'demo.sliderLeft': 'تشخیص',
     'demo.sliderRight': 'اصلی',
+    'demo.llmTitleByClass': 'تعداد به تفکیک کلاس',
     'demo.llmTitle': 'داده‌های تشخیص',
     'demo.copy': 'کپی',
     'demo.copied': 'کپی شد',
@@ -90,17 +96,22 @@ const tr = {
     'feat5.desc': 'Fine-tune confidence and IoU per object for optimal results.',
     'feat6.title': 'Export & Download',
     'feat6.desc': 'Download annotated images and structured data for any object.',
-    'objects.label': 'Objects',
-    'objects.title': 'What can you count?',
-    'objects.subtitle': 'Each object has its own dedicated model. Isogam is active now — more coming soon.',
-    'objects.obj1': 'Isogam',
+    'objects.label': 'Categories',
+    'objects.title': 'Choose your category',
+    'objects.subtitle': 'Select a category, then choose the object to count.',
+    'objects.cat1': 'Manufacturing',
+    'objects.cat1Desc': 'Manufacturing',
+    'objects.cat2': 'Human',
+    'objects.cat2Desc': 'Human',
+    'objects.cat3': 'Animals',
+    'objects.cat3Desc': 'Animals',
+    'objects.cat4': 'More',
+    'objects.cat4Desc': 'More coming soon',
     'objects.obj1Desc': 'General Purpose',
     'objects.obj2': 'Person',
     'objects.obj2Desc': 'People detection',
-    'objects.obj3': 'Vehicle',
-    'objects.obj3Desc': 'Vehicle detection',
-    'objects.obj4': 'Animal',
-    'objects.obj4Desc': 'Animal detection',
+    'objects.obj3': 'Animal',
+    'objects.obj3Desc': 'Animal detection',
     'demo.label': 'Live Demo',
     'demo.title': 'Try it yourself',
     'demo.subtitle': 'Select your object, upload an image, and see the result.',
@@ -117,6 +128,7 @@ const tr = {
     'demo.rawDetections': 'Raw Detections',
     'demo.sliderLeft': 'Detected',
     'demo.sliderRight': 'Original',
+    'demo.llmTitleByClass': 'Per-class counts',
     'demo.llmTitle': 'Detection Data',
     'demo.copy': 'Copy',
     'demo.copied': 'Copied',
@@ -225,12 +237,16 @@ let lastBboxB64 = '';
 let lastCircleB64 = '';
 
 fetch('/models/').then(r => r.json()).then(data => {
-  data.models.forEach(name => {
-    const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = name;
-    modelSelect.appendChild(opt);
-  });
+  for (const [cat, objects] of Object.entries(data.categories)) {
+    for (const [obj, models] of Object.entries(objects)) {
+      models.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = cat + '/' + obj + '/' + name;
+        opt.textContent = cat + ' / ' + obj + ' — ' + name;
+        modelSelect.appendChild(opt);
+      });
+    }
+  }
 });
 
 const fileInput = document.createElement('input');
@@ -317,14 +333,21 @@ async function predict() {
     document.getElementById('actionBarText').setAttribute('data-i18n-alt-switched', '1');
     detectBtn.textContent = t('demo.detect');
 
+    const byClass = {};
+    data.detections.forEach(d => {
+      const k = d.class_name || '?';
+      byClass[k] = (byClass[k] || 0) + 1;
+    });
+    const classBreakdown = Object.entries(byClass)
+      .map(([name, cnt]) => `  ${name}: ${cnt}`).join('\n');
     const lines = data.detections.map((d, i) => {
       const b = d.bbox.map(v => Math.round(v));
-      return `#${i + 1}: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
+      return `#${i + 1} [${d.class_name}]: bbox [${b[0]}, ${b[1]}, ${b[2]}, ${b[3]}]  conf ${d.confidence}${d.keypoints.length ? `  keypoints: ${JSON.stringify(d.keypoints)}` : ''}`;
     });
     const total = data.dedup_count;
     const raw = data.count;
     document.getElementById('llmText').value =
-      `${t('demo.finalCount')}: ${total}\n${t('demo.rawDetections')}: ${raw}\n\n${t('demo.llmTitle')}:\n${lines.join('\n')}`;
+      `${t('demo.finalCount')}: ${total}\n${t('demo.rawDetections')}: ${raw}\n\n${t('demo.llmTitleByClass') || 'Per-class'}:\n${classBreakdown}\n\n${t('demo.llmTitle')}:\n${lines.join('\n')}`;
     show(document.getElementById('llmOutput'));
     show(document.getElementById('dlRow'));
   } catch (err) {
@@ -407,3 +430,15 @@ function downloadB64(b64, name) {
 
 document.getElementById('downloadBboxBtn').addEventListener('click', () => downloadB64(lastBboxB64, 'bbox-annotated.jpg'));
 document.getElementById('downloadCircleBtn').addEventListener('click', () => downloadB64(lastCircleB64, 'circle-annotated.jpg'));
+
+document.querySelectorAll('[data-model]').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('[data-model]').forEach(x => x.classList.remove('selected'));
+    el.classList.add('selected');
+    const name = el.getAttribute('data-model');
+    for (const opt of modelSelect.options) {
+      if (opt.value === name) { modelSelect.value = opt.value; break; }
+    }
+    document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
+  });
+});
