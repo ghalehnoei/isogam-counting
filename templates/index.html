@@ -97,6 +97,7 @@
         </button>
         <button id="langToggle" class="text-xs font-semibold text-[var(--text2)] hover:text-[var(--text)] transition-colors px-2 py-0.5 rounded border border-[var(--border)] hover:border-[var(--border2)] min-w-[32px] text-center">EN</button>
         <a href="#features" class="hover:text-[var(--text)] transition-colors hidden sm:block" data-i18n="nav.features">امکانات</a>
+        <a href="#objects" class="hover:text-[var(--text)] transition-colors hidden sm:block" data-i18n="nav.objects">اشیاء</a>
         <a href="#demo" class="hover:text-[var(--text)] transition-colors hidden sm:block" data-i18n="nav.demo">نمایش زنده</a>
         <a href="https://github.com" target="_blank" class="hover:text-[var(--text)] transition-colors hidden sm:block">GitHub</a>
         <a href="#demo" class="bg-[#F97316] text-[#09090B] px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#EA580C] transition-colors" data-i18n="nav.cta">شروع کنید</a>
@@ -112,16 +113,16 @@
         <span data-i18n="hero.badge">قدرت‌گرفته از YOLO</span>
       </span>
     </div>
-    <h1 class="animate-fade-up delay-1 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.15] max-w-3xl mx-auto">
-      <span data-i18n="hero.title1">شمارش اشیا با</span><br>
-      <span class="text-transparent bg-clip-text bg-gradient-to-l from-[#F97316] to-[#FB923C]" data-i18n="hero.title2">دقت هوش مصنوعی</span>
+    <h1 class="animate-fade-up delay-1 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.15] max-w-4xl mx-auto">
+      <span data-i18n="hero.title1">هر شی را با </span><br>
+      <span class="text-transparent bg-clip-text bg-gradient-to-l from-[#F97316] to-[#FB923C]" data-i18n="hero.title2">دقت هوش مصنوعی</span><span data-i18n="hero.title3"> بشمار</span>
     </h1>
-    <p class="animate-fade-up delay-2 mt-3 text-[var(--text2)] text-sm sm:text-base max-w-xl mx-auto leading-relaxed" data-i18n="hero.subtitle">
-      تصویر خود را آپلود کنید و تعداد دقیق اشیا را با استفاده از جدیدترین مدل‌های تشخیص YOLO و حذف هوشمند اشیای تکراری دریافت کنید.
+    <p class="animate-fade-up delay-2 mt-3 text-[var(--text2)] text-sm sm:text-base max-w-2xl mx-auto leading-relaxed" data-i18n="hero.subtitle">
+      شی مورد نظر را انتخاب کنید، تصویر را بارگذاری کنید، و مدل هوش مصنوعی تخصصی بقیه کار را انجام می‌دهد — شمارش دقیق با حذف هوشمند موارد تکراری.
     </p>
     <div class="animate-fade-up delay-3 mt-5 flex flex-wrap justify-center gap-2.5">
-      <a href="#demo" class="bg-[#F97316] text-[#09090B] px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#EA580C] transition-all hover:-translate-y-0.5 shadow-lg shadow-[#F97316]/20" data-i18n="hero.cta1">امتحان کنید</a>
-      <a href="#features" class="border border-[var(--border2)] text-[var(--text2)] px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-[var(--border2)] hover:text-[var(--text)] transition-all" data-i18n="hero.cta2">مشاهده امکانات</a>
+      <a href="#objects" class="bg-[#F97316] text-[#09090B] px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-[#EA580C] transition-all hover:-translate-y-0.5 shadow-lg shadow-[#F97316]/20" data-i18n="hero.cta1">انتخاب شی</a>
+      <a href="#demo" class="border border-[var(--border2)] text-[var(--text2)] px-5 py-2.5 rounded-xl font-semibold text-sm hover:border-[var(--border2)] hover:text-[var(--text)] transition-all" data-i18n="hero.cta2">شروع کنید</a>
     </div>
 
   </section>
@@ -130,38 +131,81 @@
   <section id="features" class="py-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
     <div class="text-center mb-6">
       <span class="text-[#F97316] text-[10px] font-semibold tracking-widest uppercase" data-i18n="features.label">امکانات</span>
-      <h2 class="text-xl sm:text-2xl font-bold mt-1" data-i18n="features.title">همه‌چیز برای شمارش دقیق</h2>
+      <h2 class="text-xl sm:text-2xl font-bold mt-1" data-i18n="features.title">شمارش هوشمند برای هر شی</h2>
     </div>
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
       <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
         <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></div>
-        <h3 class="font-semibold text-xs mb-1" data-i18n="feat1.title">قدرت YOLO</h3>
-        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat1.desc">استفاده از جدیدترین مدل‌های تشخیص YOLO برای شناسایی دقیق و بلادرنگ اشیا.</p>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat1.title">تشخیص چندشی</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat1.desc">هر شی را با مدل اختصاصی آن تشخیص دهید — از اشیای عمومی تا تخصصی.</p>
       </div>
       <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
         <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-        <h3 class="font-semibold text-xs mb-1" data-i18n="feat2.title">حذف موارد تکراری</h3>
-        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat2.desc">تشخیص هوشمند اشیای هم‌پوشان با استفاده از آستانه IoU برای شمارش دقیق‌تر.</p>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat2.title">مدل اختصاصی</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat2.desc">هر شی مدل YOLO بهینه‌شده خود را دارد برای بهترین دقت تشخیص.</p>
       </div>
       <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
         <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg></div>
-        <h3 class="font-semibold text-xs mb-1" data-i18n="feat3.title">تشخیص نقاط کلیدی</h3>
-        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat3.desc">پشتیبانی از مدل‌های تشخیص حالت (Pose) با نمایش نقاط کلیدی روی تصویر.</p>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat3.title">حذف تکراری</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat3.desc">تشخیص هوشمند اشیای هم‌پوشان با IoU — شمارش دقیق بدون دوبرابر شدن.</p>
       </div>
       <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
         <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg></div>
-        <h3 class="font-semibold text-xs mb-1" data-i18n="feat4.title">مقایسه تصویری</h3>
-        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat4.desc">مقایسه تصویر اصلی و تصویر تحلیل‌شده با یک اسلایدر کشویی.</p>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat4.title">مقایسه بصری</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat4.desc">مقایسه تصویر اصلی و تحلیل‌شده با اسلایدر کشویی برای بررسی دقیق.</p>
       </div>
       <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
         <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg></div>
-        <h3 class="font-semibold text-xs mb-1" data-i18n="feat5.title">تنظیم آستانه‌ها</h3>
-        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat5.desc">تنظیم دقیق آستانه اطمینان و IoU با اسلایدرهای زنده.</p>
+        <h3 class="font-semibold text-xs mb-1" data-i18n="feat5.title">تنظیم آستانه</h3>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat5.desc">تنظیم دقیق اطمینان و IoU مخصوص هر شی برای نتیجه مطلوب.</p>
       </div>
       <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 hover:border-[var(--border2)] hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer group shadow-sm shadow-[var(--shadow)]">
         <div class="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center text-[#F97316] mb-2 group-hover:scale-110 transition-transform duration-200 ease-out"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
         <h3 class="font-semibold text-xs mb-1" data-i18n="feat6.title">خروجی و دانلود</h3>
-        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat6.desc">دانلود تصاویر تحلیل‌شده و کپی داده‌های ساختاریافته برای استفاده در pipeline هوش مصنوعی.</p>
+        <p class="text-[var(--text2)] text-[10px] leading-relaxed" data-i18n="feat6.desc">دانلود تصاویر تحلیل‌شده و داده‌های ساختاریافته برای هر شی.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supported Objects -->
+  <section id="objects" class="py-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+    <div class="text-center mb-6">
+      <span class="text-[#F97316] text-[10px] font-semibold tracking-widest uppercase" data-i18n="objects.label">اشیاء</span>
+      <h2 class="text-xl sm:text-2xl font-bold mt-1" data-i18n="objects.title">چه چیزهایی می‌توانید بشمارید؟</h2>
+      <p class="text-[var(--text2)] text-xs mt-1 max-w-lg mx-auto" data-i18n="objects.subtitle">هر شی مدل اختصاصی خود را دارد. اکنون ایزوگام فعال است — به‌زودی موارد جدید اضافه می‌شود.</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-[var(--bg-elevated)] border-2 border-[#F97316]/40 rounded-xl p-4 text-center shadow-sm shadow-[var(--shadow)]">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-[#F97316]/15 flex items-center justify-center text-[#F97316] mb-2.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <div class="font-semibold text-xs" data-i18n="objects.obj1">ایزوگام</div>
+        <div class="text-[10px] text-[var(--text3)] mt-0.5" data-i18n="objects.obj1Desc">همه‌منظوره</div>
+        <span class="inline-block mt-2 text-[9px] font-semibold px-2 py-0.5 rounded-full bg-[#F97316]/15 text-[#F97316]">فعال</span>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl p-4 text-center opacity-50 shadow-sm shadow-[var(--shadow)]">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-[var(--text3)]/10 flex items-center justify-center text-[var(--text3)] mb-2.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
+        <div class="font-semibold text-xs" data-i18n="objects.obj2">شخص</div>
+        <div class="text-[10px] text-[var(--text3)] mt-0.5" data-i18n="objects.obj2Desc">تشخیص افراد</div>
+        <span class="inline-block mt-2 text-[9px] font-semibold px-2 py-0.5 rounded-full border border-[var(--border2)] text-[var(--text3)]">به‌زودی</span>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl p-4 text-center opacity-50 shadow-sm shadow-[var(--shadow)]">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-[var(--text3)]/10 flex items-center justify-center text-[var(--text3)] mb-2.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div class="font-semibold text-xs" data-i18n="objects.obj3">خودرو</div>
+        <div class="text-[10px] text-[var(--text3)] mt-0.5" data-i18n="objects.obj3Desc">تشخیص خودرو</div>
+        <span class="inline-block mt-2 text-[9px] font-semibold px-2 py-0.5 rounded-full border border-[var(--border2)] text-[var(--text3)]">به‌زودی</span>
+      </div>
+      <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-xl p-4 text-center opacity-50 shadow-sm shadow-[var(--shadow)]">
+        <div class="w-10 h-10 mx-auto rounded-xl bg-[var(--text3)]/10 flex items-center justify-center text-[var(--text3)] mb-2.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+        </div>
+        <div class="font-semibold text-xs" data-i18n="objects.obj4">حیوان</div>
+        <div class="text-[10px] text-[var(--text3)] mt-0.5" data-i18n="objects.obj4Desc">تشخیص حیوانات</div>
+        <span class="inline-block mt-2 text-[9px] font-semibold px-2 py-0.5 rounded-full border border-[var(--border2)] text-[var(--text3)]">به‌زودی</span>
       </div>
     </div>
   </section>
@@ -171,14 +215,14 @@
     <div class="text-center mb-5">
       <span class="text-[#F97316] text-[10px] font-semibold tracking-widest uppercase" data-i18n="demo.label">نمایش زنده</span>
       <h2 class="text-xl sm:text-2xl font-bold mt-1" data-i18n="demo.title">خودتان امتحان کنید</h2>
-      <p class="text-[var(--text2)] text-xs mt-1 max-w-lg mx-auto" data-i18n="demo.subtitle">یک تصویر بارگذاری کنید، تنظیمات را تغییر دهید و دکمه تشخیص را بزنید.</p>
+      <p class="text-[var(--text2)] text-xs mt-1 max-w-lg mx-auto" data-i18n="demo.subtitle">شی مورد نظر را انتخاب کنید، تصویر را بارگذاری کنید و نتیجه را ببینید.</p>
     </div>
 
     <!-- Controls -->
     <div class="bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg p-3 mb-3 shadow-sm shadow-[var(--shadow)]" style="transition:background-color 0.3s,border-color 0.3s">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <div>
-          <label class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider block mb-1" data-i18n="demo.model">مدل</label>
+          <label class="text-[var(--text3)] text-[9px] font-semibold uppercase tracking-wider block mb-1" data-i18n="demo.model">شی / مدل</label>
           <select id="modelSelect" class="w-full bg-[var(--bg-input)] border border-[var(--border3)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--text)] outline-none focus:border-[#F97316] appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2710%27 height=%2710%27 fill=%27%2371717A%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M8 11L3 6h10z%27/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:left 8px center;transition:background-color 0.3s,border-color 0.3s,color 0.3s"></select>
         </div>
         <div>

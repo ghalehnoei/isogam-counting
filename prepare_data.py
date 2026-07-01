@@ -10,9 +10,9 @@ import argparse
 def prepare_yolo_dataset(
     source_dir,
     output_dir="data",
-    train_ratio=0.7,
-    val_ratio=0.15,
-    test_ratio=0.15,
+    train_ratio=0.8,
+    val_ratio=0.1,
+    test_ratio=0.1,
     class_names=None,
 ):
     """
