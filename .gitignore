@@ -14,6 +14,8 @@ yolo11l.pt
 yolo11n.pt
 yolo26n.pt
 project-1-at-2026-06-30-11-32-249cee2d.zip
+.opencode/
+.agent/
 
 # Virtual Environment
 .venv/
