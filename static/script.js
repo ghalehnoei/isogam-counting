@@ -165,7 +165,7 @@ function applyLang(lang) {
 
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (tr[lang][key]) el.textContent = tr[lang][key];
+    if (key in tr[lang]) el.textContent = tr[lang][key];
   });
 
   document.title = t('pageTitle');
